@@ -17,10 +17,19 @@ jobs:
           mkdir -p /tmp/suho-site-pages/assets
           mkdir -p /tmp/suho-site-pages/recruit
           mkdir -p /tmp/suho-site-pages/news
+          mkdir -p /tmp/suho-site-pages/admin/news
           cp index.html /tmp/suho-site-pages/index.html
           cp assets/suho-logo-white.png /tmp/suho-site-pages/assets/suho-logo-white.png
           cp recruit/index.html /tmp/suho-site-pages/recruit/index.html
           cp news/index.html /tmp/suho-site-pages/news/index.html
+          cp admin/news/index.html /tmp/suho-site-pages/admin/news/index.html
+
+      - name: Deploy News API Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: e3c3fecc26006293f0130c4a5967b62d
+          command: deploy --config wrangler.news-api.jsonc
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

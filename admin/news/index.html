@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ニュース管理 | SUHO Japan</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root {
+      --void: #05070a;
+      --ink: #e8edf0;
+      --muted: #aeb9bf;
+      --faint: #75858e;
+      --cyan: #00d2ff;
+      --purple: #9127ff;
+      --green: #4ade80;
+      --danger: #ff6b6b;
+      --panel: rgba(15, 23, 42, 0.72);
+      --line: rgba(133, 147, 153, 0.24);
+      --radius: 8px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
+        radial-gradient(circle at 84% 22%, rgba(145, 39, 255, 0.12), transparent 28rem),
+        var(--void);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    .container { width: min(100% - 40px, 1180px); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(5,7,10,.82);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: inline-flex; align-items: center; width: 150px; min-height: 44px; }
+    .brand-logo { width: 150px; height: 44px; object-fit: contain; }
+    .admin-badge {
+      padding: 6px 10px;
+      border: 1px solid rgba(0,210,255,.24);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0,210,255,.08);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    main { padding: 54px 0 90px; }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 38px;
+      line-height: 1.2;
+    }
+    .lead { margin: 0 0 30px; color: var(--muted); }
+    .panel {
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+    .login {
+      max-width: 520px;
+      margin: 58px auto 0;
+      padding: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .form {
+      padding: 24px;
+      position: sticky;
+      top: 94px;
+    }
+    .list { padding: 18px; }
+    label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    input, select, textarea {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(133,147,153,.25);
+      border-radius: var(--radius);
+      outline: none;
+      background: rgba(5,7,10,.46);
+      color: var(--ink);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    textarea { min-height: 132px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,210,255,.14);
+    }
+    .field { margin-bottom: 16px; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 8px 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .check input { width: 18px; min-height: 18px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .btn-primary { background: var(--cyan); color: #001e27; }
+    .btn-ghost { border-color: rgba(0,210,255,.34); color: var(--cyan); background: rgba(0,210,255,.04); }
+    .btn-danger { border-color: rgba(255,107,107,.38); color: var(--danger); background: rgba(255,107,107,.06); }
+    .message { min-height: 22px; margin-top: 14px; color: var(--muted); font-size: 13px; }
+    .message.ok { color: var(--green); }
+    .message.error { color: var(--danger); }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 6px 6px 18px;
+    }
+    .toolbar h2 { margin: 0; font-size: 20px; }
+    .news-item {
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      background: rgba(5,7,10,.34);
+    }
+    .news-item + .news-item { margin-top: 12px; }
+    .news-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .news-title { font-weight: 900; line-height: 1.45; }
+    .news-meta { color: var(--faint); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .news-excerpt { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border: 1px solid rgba(0,210,255,.24);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0,210,255,.08);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .form { position: static; }
+    }
+    @media (max-width: 580px) {
+      .container { width: min(100% - 28px, 1180px); }
+      .row { grid-template-columns: 1fr; }
+      .topbar-inner { height: 66px; }
+      h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="../../index.html#top"><img class="brand-logo" src="../../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+      <span class="admin-badge">News Admin</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section id="loginPanel" class="panel login">
+        <h1>ニュース管理</h1>
+        <p class="lead">管理者パスワードでログインしてください。</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="password">管理者パスワード</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button class="btn btn-primary" type="submit">ログイン</button>
+          <div id="loginMessage" class="message"></div>
+        </form>
+      </section>
+
+      <section id="adminPanel" class="hidden">
+        <h1>ニュース管理</h1>
+        <p class="lead">ニュース記事を登録、編集、削除できます。保存後すぐに公開ページへ反映されます。</p>
+        <div class="grid">
+          <form id="articleForm" class="panel form">
+            <input id="articleId" type="hidden" />
+            <div class="field">
+              <label for="title">タイトル</label>
+              <input id="title" required />
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="category">カテゴリ</label>
+                <select id="category">
+                  <option value="corporate">コーポレート</option>
+                  <option value="service">サービス</option>
+                  <option value="partnership">パートナーシップ</option>
+                  <option value="event">イベント</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="date">日付</label>
+                <input id="date" placeholder="2026.05.25" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="emoji">アイコン</label>
+              <input id="emoji" placeholder="📰" />
+            </div>
+            <div class="field">
+              <label for="excerpt">本文概要</label>
+              <textarea id="excerpt" required></textarea>
+            </div>
+            <label class="check"><input id="featured" type="checkbox" /> Featured記事にする</label>
+            <div class="actions">
+              <button class="btn btn-primary" type="submit">保存する</button>
+              <button class="btn btn-ghost" type="button" id="newButton">新規作成</button>
+              <button class="btn btn-ghost" type="button" id="logoutButton">ログアウト</button>
+            </div>
+            <div id="formMessage" class="message"></div>
+          </form>
+
+          <div class="panel list">
+            <div class="toolbar">
+              <h2>記事一覧</h2>
+              <button class="btn btn-ghost" type="button" id="refreshButton">再読み込み</button>
+            </div>
+            <div id="articleList"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const tokenKey = "suho_news_admin_token";
+    let articles = [];
+
+    const loginPanel = document.getElementById("loginPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginForm = document.getElementById("loginForm");
+    const loginMessage = document.getElementById("loginMessage");
+    const articleForm = document.getElementById("articleForm");
+    const formMessage = document.getElementById("formMessage");
+    const articleList = document.getElementById("articleList");
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage(loginMessage, "ログイン中...");
+      try {
+        const result = await api("/login", {
+          method: "POST",
+          body: JSON.stringify({ password: document.getElementById("password").value })
+        }, false);
+        sessionStorage.setItem(tokenKey, result.token);
+        setMessage(loginMessage, "ログインしました。", "ok");
+        await showAdmin();
+      } catch (error) {
+        setMessage(loginMessage, "ログインに失敗しました。", "error");
+      }
+    });
+
+    articleForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const article = readForm();
+      try {
+        const id = document.getElementById("articleId").value;
+        const result = await api(id ? `/articles/${encodeURIComponent(id)}` : "/articles", {
+          method: id ? "PUT" : "POST",
+          body: JSON.stringify(article)
+        });
+        articles = result.articles;
+        clearForm();
+        renderList();
+        setMessage(formMessage, "保存しました。", "ok");
+      } catch (error) {
+        setMessage(formMessage, error.message || "保存に失敗しました。", "error");
+      }
+    });
+
+    document.getElementById("newButton").addEventListener("click", clearForm);
+    document.getElementById("refreshButton").addEventListener("click", loadArticles);
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      sessionStorage.removeItem(tokenKey);
+      adminPanel.classList.add("hidden");
+      loginPanel.classList.remove("hidden");
+    });
+
+    async function showAdmin() {
+      loginPanel.classList.add("hidden");
+      adminPanel.classList.remove("hidden");
+      await loadArticles();
+    }
+
+    async function loadArticles() {
+      const result = await api("/articles", {}, false);
+      articles = result.articles || [];
+      renderList();
+    }
+
+    function renderList() {
+      articleList.innerHTML = articles.map((article) => `
+        <article class="news-item">
+          <div class="news-head">
+            <div>
+              <div class="news-title">${escapeHtml(article.emoji || "📰")} ${escapeHtml(article.title)}</div>
+              <span class="pill">${categoryLabel(article.category)}${article.featured ? " / Featured" : ""}</span>
+            </div>
+            <div class="news-meta">${escapeHtml(article.date)}</div>
+          </div>
+          <div class="news-excerpt">${escapeHtml(article.excerpt)}</div>
+          <div class="actions">
+            <button class="btn btn-ghost" type="button" data-edit="${article.id}">編集</button>
+            <button class="btn btn-danger" type="button" data-delete="${article.id}">削除</button>
+          </div>
+        </article>
+      `).join("");
+
+      articleList.querySelectorAll("[data-edit]").forEach((button) => {
+        button.addEventListener("click", () => editArticle(button.dataset.edit));
+      });
+      articleList.querySelectorAll("[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => deleteArticle(button.dataset.delete));
+      });
+    }
+
+    function editArticle(id) {
+      const article = articles.find((item) => item.id === id);
+      if (!article) return;
+      document.getElementById("articleId").value = article.id;
+      document.getElementById("title").value = article.title;
+      document.getElementById("category").value = article.category;
+      document.getElementById("date").value = article.date;
+      document.getElementById("emoji").value = article.emoji || "";
+      document.getElementById("excerpt").value = article.excerpt;
+      document.getElementById("featured").checked = Boolean(article.featured);
+      setMessage(formMessage, "編集中です。", "ok");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteArticle(id) {
+      if (!confirm("この記事を削除しますか？")) return;
+      const result = await api(`/articles/${encodeURIComponent(id)}`, { method: "DELETE" });
+      articles = result.articles;
+      renderList();
+      setMessage(formMessage, "削除しました。", "ok");
+    }
+
+    function readForm() {
+      return {
+        id: document.getElementById("articleId").value,
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        date: document.getElementById("date").value,
+        emoji: document.getElementById("emoji").value || "📰",
+        excerpt: document.getElementById("excerpt").value,
+        featured: document.getElementById("featured").checked
+      };
+    }
+
+    function clearForm() {
+      articleForm.reset();
+      document.getElementById("articleId").value = "";
+      document.getElementById("emoji").value = "📰";
+      setMessage(formMessage, "");
+    }
+
+    async function api(path, options = {}, authorized = true) {
+      const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+      if (authorized) headers.Authorization = `Bearer ${sessionStorage.getItem(tokenKey) || ""}`;
+      const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || "Request failed");
+      return body;
+    }
+
+    function setMessage(element, text, type = "") {
+      element.textContent = text;
+      element.className = `message ${type}`.trim();
+    }
+
+    function categoryLabel(category) {
+      return {
+        corporate: "コーポレート",
+        service: "サービス",
+        partnership: "パートナーシップ",
+        event: "イベント"
+      }[category] || category;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    if (sessionStorage.getItem(tokenKey)) showAdmin();
+  </script>
+</body>
+</html>

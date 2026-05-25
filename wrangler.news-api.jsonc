@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "suho-site-news-api",
+  "main": "worker/news-api.js",
+  "compatibility_date": "2026-05-25",
+  "kv_namespaces": [
+    {
+      "binding": "NEWS_KV",
+      "id": "3a2fd53f257140ec80b5e6932d734373"
+    }
+  ]
+}

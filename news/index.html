@@ -515,7 +515,7 @@
             <button class="filter-btn" type="button" data-filter="event">イベント</button>
           </div>
 
-          <article class="featured reveal" data-category="partnership">
+          <article class="featured reveal" id="featuredNews" data-category="partnership">
             <div class="featured-visual">
               🤝
               <span class="featured-label">Featured</span>
@@ -669,9 +669,86 @@
   <script>
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
+    const NEWS_API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
     const filterButtons = document.querySelectorAll(".filter-btn");
-    const newsItems = document.querySelectorAll(".news-card, .featured");
     const newsletterForm = document.getElementById("newsletterForm");
+    const newsGrid = document.getElementById("newsGrid");
+    const featuredNews = document.getElementById("featuredNews");
+    const categoryLabels = {
+      corporate: "コーポレート",
+      service: "サービス",
+      partnership: "パートナーシップ",
+      event: "イベント"
+    };
+    const defaultArticles = [
+      {
+        id: "snaptag-partnership-2025",
+        title: "韓国の非可視性ウォーターマーク先導企業「スナップタグ」と戦略的提携",
+        category: "partnership",
+        date: "2025.08.04",
+        excerpt: "韓国の非可視性ウォーターマーク技術を持つスナップタグ社との戦略的提携を発表しました。デジタルコンテンツ保護と権利管理の強化を推進してまいります。",
+        emoji: "🤝",
+        featured: true
+      },
+      {
+        id: "naver-cloud-msp-2025",
+        title: "韓国ネイバークラウドMSPシルバーランク達成記念割引プロモーション開催",
+        category: "corporate",
+        date: "2025.04.22",
+        excerpt: "ネイバークラウドMSPシルバーランク達成を記念した特別割引プロモーションを実施いたします。",
+        emoji: "🏅"
+      },
+      {
+        id: "overseas-expansion-service-2024",
+        title: "新たな収益創出への踏み出し『海外進出お任せサービス』をご紹介",
+        category: "service",
+        date: "2024.04.10",
+        excerpt: "海外市場への進出を全面的にサポートする新サービス『海外進出お任せサービス』を開始いたします。",
+        emoji: "🌏"
+      },
+      {
+        id: "security-diagnosis-2020",
+        title: "Webサイト脆弱性診断サービスが完全無料！ Webサイトの攻撃遮断サービス",
+        category: "service",
+        date: "2020.09.08",
+        excerpt: "Webサイトの脆弱性診断を無償で提供するキャンペーンを実施。サイバー攻撃からWebサイトを守ります。",
+        emoji: "🛡️"
+      },
+      {
+        id: "naver-partnership-2020",
+        title: "株式会社スホ、韓国ネイバービジネスプラットフォームとパートナー契約を締結",
+        category: "partnership",
+        date: "2020.07.30",
+        excerpt: "韓国最大規模のITプラットフォーム企業、ネイバービジネスプラットフォームとの正式パートナー契約を締結しました。",
+        emoji: "🤝"
+      },
+      {
+        id: "whatap-monitoring-2019",
+        title: "Whatap ITモニタリングサービスを開始",
+        category: "service",
+        date: "2019.11.01",
+        excerpt: "システムの状態をリアルタイムで可視化するITモニタリングサービス「Whatap」の提供を開始しました。",
+        emoji: "📊"
+      },
+      {
+        id: "tgs-2017-gyro-vr",
+        title: "東京ゲームショウ2017「GYRO VR」展示のご報告",
+        category: "event",
+        date: "2017.09.25",
+        excerpt: "東京ゲームショウ2017にてVRコンテンツ「GYRO VR」を出展いたしました。",
+        emoji: "🥽"
+      },
+      {
+        id: "aryaka-partnership-2016",
+        title: "株式会社スホがSDNプラットフォーム供給企業Aryakaとパートナー契約を締結",
+        category: "partnership",
+        date: "2016.10.27",
+        excerpt: "グローバルSDNプラットフォームのリーダー企業Aryakaとの正式パートナーシップを締結しました。",
+        emoji: "🌐"
+      }
+    ];
+    let articles = defaultArticles;
+    let currentFilter = "all";
 
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
@@ -689,10 +766,8 @@
       button.addEventListener("click", () => {
         filterButtons.forEach((item) => item.classList.remove("active"));
         button.classList.add("active");
-        const filter = button.dataset.filter;
-        newsItems.forEach((item) => {
-          item.classList.toggle("hidden", filter !== "all" && item.dataset.category !== filter);
-        });
+        currentFilter = button.dataset.filter;
+        renderArticles();
       });
     });
 
@@ -717,6 +792,74 @@
     }, { threshold: 0.14 });
 
     document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+
+    loadArticles();
+
+    async function loadArticles() {
+      try {
+        const response = await fetch(`${NEWS_API_URL}/articles`);
+        const data = await response.json();
+        if (Array.isArray(data.articles)) articles = data.articles;
+      } catch (error) {
+        articles = defaultArticles;
+      }
+      renderArticles();
+    }
+
+    function renderArticles() {
+      const sorted = [...articles].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      const featured = currentFilter === "all" ? sorted.find((article) => article.featured) : null;
+      const list = sorted.filter((article) => article.id !== featured?.id);
+      const filtered = currentFilter === "all" ? list : list.filter((article) => article.category === currentFilter);
+
+      if (featured) {
+        featuredNews.classList.remove("hidden");
+        featuredNews.dataset.category = featured.category;
+        featuredNews.innerHTML = `
+          <div class="featured-visual">
+            ${escapeHtml(featured.emoji || "📰")}
+            <span class="featured-label">Featured</span>
+          </div>
+          <div>
+            ${categoryBadge(featured.category)}
+            <h2>${escapeHtml(featured.title)}</h2>
+            <p>${escapeHtml(featured.excerpt)}</p>
+            <div class="meta"><span>${escapeHtml(featured.date)}</span><span class="meta-dot"></span><span>${escapeHtml(categoryLabels[featured.category] || featured.category)}</span></div>
+            <a class="read-more" href="#">続きを読む →</a>
+          </div>
+        `;
+      } else {
+        featuredNews.classList.add("hidden");
+        featuredNews.innerHTML = "";
+      }
+
+      newsGrid.innerHTML = filtered.length ? filtered.map((article) => `
+        <article class="news-card reveal visible" data-category="${escapeHtml(article.category)}">
+          <div class="thumb">${escapeHtml(article.emoji || "📰")}</div>
+          <div class="card-body">
+            ${categoryBadge(article.category)}
+            <div class="card-title">${escapeHtml(article.title)}</div>
+            <p class="card-excerpt">${escapeHtml(article.excerpt)}</p>
+            <div class="card-meta">${escapeHtml(article.date)}</div>
+          </div>
+        </article>
+      `).join("") : `<p class="card-excerpt" style="grid-column:1/-1;text-align:center">記事がありません。</p>`;
+    }
+
+    function categoryBadge(category) {
+      const className = category === "service" ? "" : category;
+      return `<span class="category ${escapeHtml(className)}">${escapeHtml(categoryLabels[category] || category)}</span>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
   </script>
 </body>
 </html>
