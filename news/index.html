@@ -369,6 +369,18 @@
       font-size: 12px;
       font-weight: 800;
     }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: auto;
+    }
+    .card-footer .read-more {
+      margin-top: 0;
+      white-space: nowrap;
+      font-size: 12px;
+    }
     .read-more {
       display: inline-flex;
       align-items: center;
@@ -881,7 +893,10 @@
             ${categoryBadge(article.category)}
             <div class="card-title">${escapeHtml(article.title)}</div>
             <p class="card-excerpt">${escapeHtml(article.excerpt)}</p>
-            <div class="card-meta">${escapeHtml(article.date)}</div>
+            <div class="card-footer">
+              <div class="card-meta">${escapeHtml(article.date)}</div>
+              ${readMoreLink(article)}
+            </div>
           </div>
         </article>
       `).join("") : `<p class="card-excerpt" style="grid-column:1/-1;text-align:center">記事がありません。</p>`;
