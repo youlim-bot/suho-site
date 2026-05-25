@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>沿革 | SUHO Japan</title>
+  <meta name="description" content="株式会社スホの沿革。2010年の創業期から現在までの主要な契約、パートナーシップ、サービス展開をご紹介します。" />
+  <style>
+    :root {
+      --void: #05070a;
+      --ink: #e8edf0;
+      --muted: #aeb9bf;
+      --faint: #75858e;
+      --cyan: #00d2ff;
+      --purple: #9127ff;
+      --green: #4ade80;
+      --panel: rgba(15, 23, 42, 0.68);
+      --line: rgba(133, 147, 153, 0.24);
+      --container: 1180px;
+      --radius: 8px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--void);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .site-shell {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
+        radial-gradient(circle at 84% 24%, rgba(145, 39, 255, 0.12), transparent 28rem),
+        linear-gradient(180deg, #06090d 0%, #05070a 46%, #071010 100%);
+    }
+    .container { width: min(100% - 48px, var(--container)); margin: 0 auto; }
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 7, 10, 0.78);
+      backdrop-filter: blur(18px);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      gap: 28px;
+    }
+    .brand { display: inline-flex; align-items: center; width: 150px; min-height: 44px; }
+    .brand-logo { display: block; width: 150px; height: 44px; object-fit: contain; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .nav-links a { transition: color 180ms ease; }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-actions { display: flex; align-items: center; gap: 14px; }
+    .lang { color: var(--faint); font-size: 12px; }
+    .menu-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn svg { width: 16px; height: 16px; }
+    .btn-primary { background: var(--cyan); color: #001e27; box-shadow: 0 0 24px rgba(0, 210, 255, 0.18); }
+    .hero {
+      position: relative;
+      min-height: 64vh;
+      display: flex;
+      align-items: center;
+      padding: 132px 0 78px;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(5, 7, 10, 0.92), rgba(5, 7, 10, 0.66), rgba(5, 7, 10, 0.88)),
+        linear-gradient(180deg, rgba(5, 7, 10, 0.18), var(--void)),
+        url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1900&q=80") center / cover;
+      opacity: 0.94;
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 210, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 255, 0.08) 1px, transparent 1px);
+      background-size: 74px 74px;
+      mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+      opacity: 0.28;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 34px;
+      padding: 0 14px;
+      margin-bottom: 26px;
+      border: 1px solid rgba(0, 210, 255, 0.30);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0, 210, 255, 0.08);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.7);
+    }
+    h1 {
+      margin: 0 0 24px;
+      font-size: 64px;
+      line-height: 1.06;
+      font-weight: 950;
+    }
+    .accent { color: var(--cyan); }
+    .lead {
+      max-width: 760px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.9;
+    }
+    .section { padding: 94px 0; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 52px;
+    }
+    .summary-card {
+      min-height: 128px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+    .summary-card strong {
+      display: block;
+      color: var(--cyan);
+      font-size: 30px;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .summary-card span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 22px;
+    }
+    .year-block {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .year {
+      position: sticky;
+      top: 96px;
+      min-height: 88px;
+      padding: 18px;
+      border: 1px solid rgba(0, 210, 255, 0.20);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(0, 210, 255, 0.16), transparent 8rem),
+        rgba(15, 23, 42, 0.72);
+      color: var(--cyan);
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 1;
+    }
+    .events {
+      display: grid;
+      gap: 12px;
+      padding-left: 22px;
+      border-left: 1px solid rgba(0, 210, 255, 0.22);
+    }
+    .event {
+      position: relative;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 16px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: rgba(15, 23, 42, 0.60);
+      backdrop-filter: blur(18px);
+    }
+    .event::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 28px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid var(--cyan);
+      border-radius: 999px;
+      background: var(--void);
+      box-shadow: 0 0 18px rgba(0, 210, 255, 0.34);
+    }
+    .month {
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 950;
+      line-height: 1;
+    }
+    .details {
+      display: grid;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .details span {
+      display: block;
+      color: var(--muted);
+    }
+    .footer {
+      padding: 70px 0 36px;
+      border-top: 1px solid var(--line);
+      background: #040608;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.3fr repeat(3, 1fr);
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+    .footer h3 { font-size: 14px; margin-bottom: 16px; }
+    .footer ul {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    .footer a, .footer p { color: var(--muted); font-size: 13px; }
+    .footer a:hover, .footer a.active { color: var(--cyan); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      color: var(--faint);
+      font-size: 12px;
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 980px) {
+      .container { width: min(100% - 40px, var(--container)); }
+      .nav-links, .lang { display: none; }
+      .menu-btn { display: grid; place-items: center; }
+      .nav.open .nav-links {
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        top: 82px;
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(5, 7, 10, 0.96);
+      }
+      .nav.open .nav-links a { padding: 12px; }
+      h1 { font-size: 44px; }
+      .summary, .footer-grid { grid-template-columns: repeat(2, 1fr); }
+      .year-block { grid-template-columns: 1fr; gap: 14px; }
+      .year { position: static; }
+    }
+    @media (max-width: 640px) {
+      .container { width: min(100% - 32px, var(--container)); }
+      .nav-inner { height: 66px; }
+      .nav-actions .btn { display: none; }
+      .hero { min-height: auto; padding-top: 116px; }
+      h1 { font-size: 34px; }
+      .lead { font-size: 16px; }
+      .summary, .footer-grid { grid-template-columns: 1fr; }
+      .section { padding: 74px 0; }
+      .event { grid-template-columns: 44px 1fr; padding: 16px; }
+      .footer-bottom { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <nav class="nav" id="nav">
+      <div class="container nav-inner">
+        <a class="brand" href="../index.html#top"><img class="brand-logo" src="../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+        <div class="nav-links" id="navLinks">
+          <a href="../index.html#services">Services</a>
+          <a href="../index.html#cloud">Cloud</a>
+          <a href="../index.html#managed">Managed Services</a>
+          <a href="../index.html#security">Security & Products</a>
+          <a href="../index.html#about">About</a>
+        </div>
+        <div class="nav-actions">
+          <span class="lang">JP / EN</span>
+          <a class="btn btn-primary" href="../index.html#contact">Contact</a>
+          <button class="menu-btn" id="menuBtn" type="button" aria-label="メニュー" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="container hero-content">
+        <div class="eyebrow"><span class="eyebrow-dot"></span>沿革 - Company History</div>
+        <h1>事業の歩みと<br /><span class="accent">信頼の積み重ね</span></h1>
+        <p class="lead">2010年の創業期から現在まで、クラウド、セキュリティ、ゲーム、運用支援の領域で築いてきた主要な実績をご紹介します。</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <div class="summary reveal">
+            <div class="summary-card"><strong>2010</strong><span>事業開始とMOU・運用契約の拡大</span></div>
+            <div class="summary-card"><strong>16年+</strong><span>ITサービス運用と構築支援の継続</span></div>
+            <div class="summary-card"><strong>Cloud</strong><span>AWS、NAVER CLOUD、Alibaba Cloudなど</span></div>
+            <div class="summary-card"><strong>Security</strong><span>WAF、GameGuard、モビリティセキュリティ</span></div>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a class="brand" href="../index.html#top"><img class="brand-logo" src="../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+            <p>AIとクラウドの力で、企業の次の成長を支えるテクノロジーパートナー。</p>
+          </div>
+          <div>
+            <h3>Services</h3>
+            <ul>
+              <li><a href="../index.html#services">AI Service</a></li>
+              <li><a href="../index.html#cloud">Cloud Consulting</a></li>
+              <li><a href="../index.html#managed">Managed Service</a></li>
+              <li><a href="../index.html#security">Security & Products</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Company</h3>
+            <ul>
+              <li><a href="../index.html#about">About Us</a></li>
+              <li><a href="../recruit/">採用情報</a></li>
+              <li><a href="../news/">ニュース</a></li>
+              <li><a class="active" href="./">沿革</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="../index.html#contact">プライバシーポリシー</a></li>
+              <li><a href="../index.html#contact">利用規約</a></li>
+              <li><a href="../index.html#contact">お問い合わせ</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>© 2026 株式会社スホ (Suho Corporation). All rights reserved.</span>
+          <span>Architectural Intelligence</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const nav = document.getElementById("nav");
+    const menuBtn = document.getElementById("menuBtn");
+    const timeline = document.getElementById("timeline");
+    const historyItems = [
+      { year: "2025", events: [
+        ["10", ["SCONAI株式会社 AI音声通訳技術事業MOU契約"]],
+        ["08", ["SNAPTAG株式会社 非可視性ウォーターマーク事業MOU契約"]]
+      ] },
+      { year: "2024", events: [
+        ["11", ["韓国コンテンツ振興院 業務委託契約"]],
+        ["06", ["株式会社ゲームオン 業務委託契約"]],
+        ["03", ["株式会社アイギステック パートナー契約"]]
+      ] },
+      { year: "2023", events: [
+        ["12", ["Schneider Electric パートナー契約"]],
+        ["11", ["進撃の巨人Brave Order 海外(韓国)サービス展開"]],
+        ["06", ["VMware パートナー契約"]],
+        ["05", ["Cisco パートナー契約"]],
+        ["01", ["Quad Miners パートナー契約"]]
+      ] },
+      { year: "2022", events: [
+        ["12", ["KBS JAPAN株式会社 インフラ保守サポート契約"]],
+        ["08", ["ごとぱず「五等分の花嫁 五つ子ちゃんはパズルを五等分できない。」 開発、運営"]],
+        ["07", ["Alibaba cloud サービス開始"]],
+        ["05", ["NaverCloudインフラ構築支援"]]
+      ] },
+      { year: "2021", events: [
+        ["12", ["bitsensing Ink. 共同開発契約"]],
+        ["11", ["AUTOCRYPT Co.,Ltd モビリティセキュリティ業務委託契約"]],
+        ["10", ["ADK グループ 業務提供契約"]],
+        ["08", ["株式会社ビーグリー 著作物利用契約"]],
+        ["07", ["駐日韓国文化院 業務委託契約"]],
+        ["06", ["株式会社aix 業務提供契約", "LKS Global Co.,Ltd 共同開発契約"]]
+      ] },
+      { year: "2020", events: [
+        ["12", ["INOVANA 業務提供契約"]],
+        ["06", ["株式会社エクスペリエンスD 業務提供契約"]],
+        ["04", ["NAVER CLOUD MSP契約"]],
+        ["01", ["株式会社ジェシー 業務提供契約", "SBクラウド株式会社 販売代理店契約"]]
+      ] },
+      { year: "2019", events: [
+        ["10", ["システム監視サービス SaaSモデル【WhaTap】開始"]],
+        ["06", ["株式会社マーベラス モバイスゲーム(ガール・カフェ・ガン) AWS運用契約"]],
+        ["04", ["博報堂プロダクツ Galaxy Harajukuシステム運用契約", "株式会社NAMUTECHJAPAN Cocktail Cloud パートナー契約"]]
+      ] },
+      { year: "2018", events: [
+        ["12", ["NHNJAPAN株式会社 AegisWall パートナー契約", "株式会社Secuiパトナー契約"]],
+        ["09", ["クララオンラインWAFサービス代理店契約"]],
+        ["04", ["パイオリンク販売パートナー契約"]],
+        ["02", ["東京韓国学校 ファイアウォール構築"]]
+      ] },
+      { year: "2017", events: [
+        ["09", ["GYRO VR 日本販売発表 - 東京ゲームショウ2017出展"]],
+        ["08", ["SANGWHA (GYRO VR) パートナー契約"]],
+        ["07", ["Virtuix Omni 日本販売開始発表", "SBクラウド株式会社 パートナー契約"]],
+        ["04", ["ペンタセキュリティシステムズ株式会社 パートナー契約"]],
+        ["03", ["株式会社H2Interactive AWS運用契約"]]
+      ] },
+      { year: "2016", events: [
+        ["10", ["Aryaka SDNプラットフォームサービス契約"]],
+        ["08", ["サムスン電子ジャパン株式会社 運用サポート契約"]],
+        ["06", ["株式会社JAMONG VRプラットフォームパートナー契約"]],
+        ["02", ["株式会社WeMade Online nProtect GameGuard契約"]]
+      ] },
+      { year: "2015", events: [
+        ["12", ["株式会社カプコン nProtect GameGuard契約"]],
+        ["11", ["株式会社ブライブ 構築・コロケーション契約"]],
+        ["10", ["株式会社ゲームオン 運用サポート契約"]],
+        ["09", ["株式会社マーベラス AWS運用サポート契約"]],
+        ["08", ["株式会社AMS AWSサービス契約 他多数"]],
+        ["03", ["日本サムスン株式会社 センター移転、事務室移転", "株式会社GRETECH Japan nProtect GameGuard契約", "株式会社WeMade Online nProtect GameGuard契約", "日本サムスン株式会社 移転業務受託"]],
+        ["02", ["株式会社Funnel システム運用契約"]]
+      ] },
+      { year: "2014", events: [
+        ["12", ["株式会社GRETECH Japan プライベートクラウド契約"]],
+        ["11", ["株式会社OnNet コロケーション契約"]],
+        ["10", ["NCJapan株式会社 社内ネットワーク保守契約"]],
+        ["09", ["株式会社UtoPlanet サーバーホスティング契約"]],
+        ["08", ["株式会社OnNet CDN契約", "株式会社ゲームオン nProtect GameGuard契約"]],
+        ["07", ["株式会社カプコン nProtect GameGuard契約", "NCJapan株式会社 IDCネットワーク保守契約"]],
+        ["05", ["アラリオ株式会社 IDC運営契約"]],
+        ["04", ["株式会社OnNet IDC契約"]],
+        ["03", ["株式会社Funnel IDC契約", "NCJapan株式会社 IDCネットワーク保守契約"]],
+        ["02", ["株式会社アフリカTV システム運営契約"]],
+        ["01", ["株式会社GameFlow システム運営契約"]]
+      ] },
+      { year: "2013", events: [
+        ["12", ["株式会社WeMade Online システム運営契約"]],
+        ["11", ["株式会社GRETECH Japan ネットワーク・システム構築"]],
+        ["10", ["株式会社WeMade Online ネットワーク・システム構築"]],
+        ["08", ["株式会社モブキャストグローバル コロケーション契約"]],
+        ["07", ["株式会社CDNetworks IDC契約"]],
+        ["04", ["NCJapan株式会社 ネットワーク保守契約"]],
+        ["03", ["株式会社ネクソン ネットワーク保守契約"]]
+      ] },
+      { year: "2012", events: [
+        ["12", ["駐日本国大韓民国大使館 衛星電話納品契約"]],
+        ["11", ["駐日本国大韓民国大使館 ネットワーク納品契約"]],
+        ["07", ["株式会社エンタークルーズ コロケーション契約"]],
+        ["06", ["株式会社PANDORATV ネットワーク保守契約"]],
+        ["05", ["株式会社エスクルー クラウドサービス契約"]],
+        ["04", ["株式会社CDNetworks IDC契約"]],
+        ["03", ["株式会社ネクソン ネットワーク保守契約"]],
+        ["02", ["オー・ジーエンターテインメント株式会社 モバイルシステム運用契約"]],
+        ["01", ["ガリアレボリューション株式会社 クラウドサービス、システム運用契約"]]
+      ] },
+      { year: "2011", events: [
+        ["11", ["ゲームウェブ株式会社 ネットワーク、システム構築"]],
+        ["08", ["FTS株式会社 ネットワーク、システム構築"]],
+        ["05", ["オージーエンターテインメント株式会社 CDN契約"]],
+        ["03", ["オージーエンターテインメント株式会社 システム運営契約"]],
+        ["02", ["DTCJapan株式会社 システム運営契約", "DTCJapan株式会社 Privateクラウドサービス契約"]],
+        ["01", ["株式会社エンタークルーズ Privateクラウドサービス契約", "KDDI株式会社 IDC事業MOU契約"]]
+      ] },
+      { year: "2010", events: [
+        ["12", ["株式会社エンタークルーズ システム運営契約", "SANKANDO株式会社 クラウドサービス契約"]],
+        ["11", ["有限会社ウイルトレーディング クラウドサービス契約"]],
+        ["10", ["株式会社Eroopay ビリングシステム事業MOU契約"]],
+        ["09", ["株式会社アンラボ セキュリティ事業MOU契約", "株式会社Kamuse CDN事業MOU契約"]],
+        ["08", ["株式会社エヌドアーズエンターテインメント システム運営契約", "スミスアンドモバイル株式会社 システム運営契約", "株式会社KTJapan IDC事業MOU契約"]],
+        ["07", ["株式会社KTJapan 業務MOU契約"]]
+      ] }
+    ];
+
+    menuBtn.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("open");
+      menuBtn.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.querySelectorAll(".nav-links a").forEach((link) => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+        menuBtn.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    timeline.innerHTML = historyItems.map((group) => `
+      <section class="year-block reveal">
+        <div class="year">${escapeHtml(group.year)}</div>
+        <div class="events">
+          ${group.events.map(([month, details]) => `
+            <article class="event">
+              <div class="month">${escapeHtml(month)}</div>
+              <div class="details">${details.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+    `).join("");
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+  </script>
+</body>
+</html>
