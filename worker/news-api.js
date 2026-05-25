@@ -167,6 +167,7 @@ function validateArticle(value) {
     date: String(value.date || "").trim(),
     excerpt: String(value.excerpt || "").trim(),
     emoji: String(value.emoji || "📰").trim(),
+    image: String(value.image || "").trim(),
     featured: Boolean(value.featured)
   };
 
@@ -175,6 +176,14 @@ function validateArticle(value) {
   }
   if (!["corporate", "service", "partnership", "event"].includes(article.category)) {
     throw httpError("invalid category", 400);
+  }
+  if (article.image) {
+    if (!/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(article.image)) {
+      throw httpError("invalid image", 400);
+    }
+    if (article.image.length > 1800000) {
+      throw httpError("image is too large", 400);
+    }
   }
   return article;
 }

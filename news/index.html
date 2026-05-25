@@ -230,6 +230,13 @@
       overflow: hidden;
       font-size: 70px;
     }
+    .featured-visual img,
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
     .featured-label {
       position: absolute;
       left: 16px;
@@ -303,15 +310,41 @@
       border-color: rgba(0, 210, 255, 0.30);
     }
     .thumb {
-      min-height: 158px;
+      height: 158px;
       display: grid;
       place-items: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       background:
         radial-gradient(circle at 30% 30%, rgba(0, 210, 255, 0.13), transparent 9rem),
         radial-gradient(circle at 78% 78%, rgba(145, 39, 255, 0.11), transparent 9rem),
-        rgba(5, 7, 10, 0.35);
+      rgba(5, 7, 10, 0.35);
       font-size: 42px;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 34px;
+    }
+    .page-btn {
+      min-width: 40px;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid rgba(133, 147, 153, 0.24);
+      border-radius: var(--radius);
+      background: rgba(15, 23, 42, 0.62);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+      transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+    }
+    .page-btn:hover,
+    .page-btn.active {
+      border-color: rgba(0, 210, 255, 0.58);
+      background: rgba(0, 210, 255, 0.12);
+      color: var(--cyan);
     }
     .card-body {
       display: flex;
@@ -612,6 +645,7 @@
               </div>
             </article>
           </div>
+          <div class="pagination" id="pagination" aria-label="News pagination"></div>
 
           <div class="newsletter reveal">
             <h2>最新情報を<span class="accent">メールで受け取る</span></h2>
@@ -674,6 +708,8 @@
     const newsletterForm = document.getElementById("newsletterForm");
     const newsGrid = document.getElementById("newsGrid");
     const featuredNews = document.getElementById("featuredNews");
+    const pagination = document.getElementById("pagination");
+    const pageSize = 6;
     const categoryLabels = {
       corporate: "コーポレート",
       service: "サービス",
@@ -749,6 +785,7 @@
     ];
     let articles = defaultArticles;
     let currentFilter = "all";
+    let currentPage = 1;
 
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
@@ -767,6 +804,7 @@
         filterButtons.forEach((item) => item.classList.remove("active"));
         button.classList.add("active");
         currentFilter = button.dataset.filter;
+        currentPage = 1;
         renderArticles();
       });
     });
@@ -808,16 +846,20 @@
 
     function renderArticles() {
       const sorted = [...articles].sort((a, b) => String(b.date).localeCompare(String(a.date)));
-      const featured = currentFilter === "all" ? sorted.find((article) => article.featured) : null;
-      const list = sorted.filter((article) => article.id !== featured?.id);
-      const filtered = currentFilter === "all" ? list : list.filter((article) => article.category === currentFilter);
+      const filteredByCategory = currentFilter === "all" ? sorted : sorted.filter((article) => article.category === currentFilter);
+      const featured = filteredByCategory[0] || null;
+      const list = filteredByCategory.filter((article) => article.id !== featured?.id);
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      currentPage = Math.min(currentPage, totalPages);
+      const start = (currentPage - 1) * pageSize;
+      const pageItems = list.slice(start, start + pageSize);
 
       if (featured) {
         featuredNews.classList.remove("hidden");
         featuredNews.dataset.category = featured.category;
         featuredNews.innerHTML = `
           <div class="featured-visual">
-            ${escapeHtml(featured.emoji || "📰")}
+            ${mediaMarkup(featured, "最新ニュース")}
             <span class="featured-label">Featured</span>
           </div>
           <div>
@@ -833,9 +875,9 @@
         featuredNews.innerHTML = "";
       }
 
-      newsGrid.innerHTML = filtered.length ? filtered.map((article) => `
+      newsGrid.innerHTML = pageItems.length ? pageItems.map((article) => `
         <article class="news-card reveal visible" data-category="${escapeHtml(article.category)}">
-          <div class="thumb">${escapeHtml(article.emoji || "📰")}</div>
+          <div class="thumb">${mediaMarkup(article, "ニュース画像")}</div>
           <div class="card-body">
             ${categoryBadge(article.category)}
             <div class="card-title">${escapeHtml(article.title)}</div>
@@ -844,11 +886,37 @@
           </div>
         </article>
       `).join("") : `<p class="card-excerpt" style="grid-column:1/-1;text-align:center">記事がありません。</p>`;
+      renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+      if (totalPages <= 1) {
+        pagination.innerHTML = "";
+        return;
+      }
+      pagination.innerHTML = Array.from({ length: totalPages }, (_, index) => {
+        const page = index + 1;
+        return `<button class="page-btn ${page === currentPage ? "active" : ""}" type="button" data-page="${page}" aria-label="${page}ページ目">${page}</button>`;
+      }).join("");
+      pagination.querySelectorAll("[data-page]").forEach((button) => {
+        button.addEventListener("click", () => {
+          currentPage = Number(button.dataset.page);
+          renderArticles();
+          newsGrid.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
     }
 
     function categoryBadge(category) {
       const className = category === "service" ? "" : category;
       return `<span class="category ${escapeHtml(className)}">${escapeHtml(categoryLabels[category] || category)}</span>`;
+    }
+
+    function mediaMarkup(article, altPrefix) {
+      if (article.image) {
+        return `<img src="${escapeAttribute(article.image)}" alt="${escapeAttribute(`${altPrefix}: ${article.title}`)}" loading="lazy" />`;
+      }
+      return escapeHtml(article.emoji || "📰");
     }
 
     function escapeHtml(value) {
@@ -859,6 +927,10 @@
         '"': "&quot;",
         "'": "&#039;"
       }[char]));
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
     }
   </script>
 </body>

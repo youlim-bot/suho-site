@@ -121,6 +121,39 @@
       grid-template-columns: 1fr 1fr;
       gap: 14px;
     }
+    .image-uploader {
+      display: grid;
+      gap: 10px;
+    }
+    .image-preview {
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px dashed rgba(0,210,255,.28);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 24% 24%, rgba(0,210,255,.12), transparent 11rem),
+        radial-gradient(circle at 82% 82%, rgba(145,39,255,.10), transparent 11rem),
+        rgba(5,7,10,.34);
+      color: var(--faint);
+      font-size: 13px;
+      font-weight: 850;
+      text-align: center;
+    }
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      display: block;
+    }
+    .image-help {
+      margin: 0;
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 1.5;
+    }
     .check {
       display: flex;
       align-items: center;
@@ -178,6 +211,28 @@
     .news-title { font-weight: 900; line-height: 1.45; }
     .news-meta { color: var(--faint); font-size: 12px; font-weight: 800; white-space: nowrap; }
     .news-excerpt { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    .news-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .list-thumb {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: rgba(0,210,255,.08);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+    .list-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
     .pill {
       display: inline-flex;
       align-items: center;
@@ -252,8 +307,15 @@
               </div>
             </div>
             <div class="field">
-              <label for="emoji">アイコン</label>
-              <input id="emoji" placeholder="📰" />
+              <label for="imageFile">画像</label>
+              <div class="image-uploader">
+                <div class="image-preview" id="imagePreview">画像を選択してください</div>
+                <input id="imageFile" type="file" accept="image/*" />
+                <input id="imageData" type="hidden" />
+                <input id="emoji" type="hidden" value="📰" />
+                <p class="image-help">選択した画像は自動でリサイズされ、ニュースカードに合わせて表示されます。</p>
+                <button class="btn btn-ghost" type="button" id="removeImageButton">画像を削除</button>
+              </div>
             </div>
             <div class="field">
               <label for="excerpt">本文概要</label>
@@ -292,6 +354,9 @@
     const articleForm = document.getElementById("articleForm");
     const formMessage = document.getElementById("formMessage");
     const articleList = document.getElementById("articleList");
+    const imageFile = document.getElementById("imageFile");
+    const imageData = document.getElementById("imageData");
+    const imagePreview = document.getElementById("imagePreview");
 
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -329,6 +394,25 @@
 
     document.getElementById("newButton").addEventListener("click", clearForm);
     document.getElementById("refreshButton").addEventListener("click", loadArticles);
+    document.getElementById("removeImageButton").addEventListener("click", () => {
+      imageFile.value = "";
+      imageData.value = "";
+      setImagePreview("");
+    });
+    imageFile.addEventListener("change", async () => {
+      const file = imageFile.files?.[0];
+      if (!file) return;
+      try {
+        setMessage(formMessage, "画像を処理中です...");
+        const resized = await resizeImage(file);
+        imageData.value = resized;
+        setImagePreview(resized);
+        setMessage(formMessage, "画像を設定しました。", "ok");
+      } catch (error) {
+        imageFile.value = "";
+        setMessage(formMessage, error.message || "画像の読み込みに失敗しました。", "error");
+      }
+    });
     document.getElementById("logoutButton").addEventListener("click", () => {
       sessionStorage.removeItem(tokenKey);
       adminPanel.classList.add("hidden");
@@ -352,7 +436,7 @@
         <article class="news-item">
           <div class="news-head">
             <div>
-              <div class="news-title">${escapeHtml(article.emoji || "📰")} ${escapeHtml(article.title)}</div>
+              <div class="news-title">${listMedia(article)} <span>${escapeHtml(article.title)}</span></div>
               <span class="pill">${categoryLabel(article.category)}${article.featured ? " / Featured" : ""}</span>
             </div>
             <div class="news-meta">${escapeHtml(article.date)}</div>
@@ -381,6 +465,9 @@
       document.getElementById("category").value = article.category;
       document.getElementById("date").value = article.date;
       document.getElementById("emoji").value = article.emoji || "";
+      imageFile.value = "";
+      imageData.value = article.image || "";
+      setImagePreview(article.image || "");
       document.getElementById("excerpt").value = article.excerpt;
       document.getElementById("featured").checked = Boolean(article.featured);
       setMessage(formMessage, "編集中です。", "ok");
@@ -402,6 +489,7 @@
         category: document.getElementById("category").value,
         date: document.getElementById("date").value,
         emoji: document.getElementById("emoji").value || "📰",
+        image: imageData.value,
         excerpt: document.getElementById("excerpt").value,
         featured: document.getElementById("featured").checked
       };
@@ -411,7 +499,54 @@
       articleForm.reset();
       document.getElementById("articleId").value = "";
       document.getElementById("emoji").value = "📰";
+      imageFile.value = "";
+      imageData.value = "";
+      setImagePreview("");
       setMessage(formMessage, "");
+    }
+
+    function setImagePreview(src) {
+      imagePreview.innerHTML = src
+        ? `<img src="${escapeAttribute(src)}" alt="ニュース画像プレビュー" />`
+        : "画像を選択してください";
+    }
+
+    function listMedia(article) {
+      if (article.image) {
+        return `<span class="list-thumb"><img src="${escapeAttribute(article.image)}" alt="" /></span>`;
+      }
+      return `<span class="list-thumb">${escapeHtml(article.emoji || "📰")}</span>`;
+    }
+
+    function resizeImage(file) {
+      if (!file.type.startsWith("image/")) {
+        return Promise.reject(new Error("画像ファイルを選択してください。"));
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        return Promise.reject(new Error("画像は8MB以下にしてください。"));
+      }
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("画像を読み込めませんでした。"));
+        reader.onload = () => {
+          const image = new Image();
+          image.onerror = () => reject(new Error("画像を読み込めませんでした。"));
+          image.onload = () => {
+            const maxSize = 900;
+            const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+            const width = Math.max(1, Math.round(image.width * scale));
+            const height = Math.max(1, Math.round(image.height * scale));
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext("2d");
+            context.drawImage(image, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.82));
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     async function api(path, options = {}, authorized = true) {
@@ -445,6 +580,10 @@
         '"': "&quot;",
         "'": "&#039;"
       }[char]));
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
     }
 
     if (sessionStorage.getItem(tokenKey)) showAdmin();
