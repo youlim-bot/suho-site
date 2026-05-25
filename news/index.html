@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ニュース | SUHO Japan</title>
+  <meta name="description" content="株式会社スホのニュース、プレスリリース、サービス情報、パートナーシップ、イベント情報をお届けします。" />
+  <style>
+    :root {
+      --void: #05070a;
+      --ink: #e8edf0;
+      --muted: #aeb9bf;
+      --faint: #75858e;
+      --cyan: #00d2ff;
+      --purple: #9127ff;
+      --green: #4ade80;
+      --yellow: #f59e0b;
+      --panel: rgba(15, 23, 42, 0.68);
+      --line: rgba(133, 147, 153, 0.24);
+      --container: 1180px;
+      --radius: 8px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--void);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .site-shell {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
+        radial-gradient(circle at 84% 22%, rgba(145, 39, 255, 0.12), transparent 28rem),
+        linear-gradient(180deg, #06090d 0%, #05070a 46%, #071010 100%);
+    }
+    .container { width: min(100% - 48px, var(--container)); margin: 0 auto; }
+
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 7, 10, 0.78);
+      backdrop-filter: blur(18px);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      gap: 28px;
+    }
+    .brand { display: inline-flex; align-items: center; width: 150px; min-height: 44px; }
+    .brand-logo { display: block; width: 150px; height: 44px; object-fit: contain; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .nav-links a { transition: color 180ms ease; }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-actions { display: flex; align-items: center; gap: 14px; }
+    .lang { color: var(--faint); font-size: 12px; }
+    .menu-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn svg { width: 16px; height: 16px; }
+    .btn-primary { background: var(--cyan); color: #001e27; box-shadow: 0 0 24px rgba(0, 210, 255, 0.18); }
+    .btn-ghost { border-color: rgba(0, 210, 255, 0.34); color: var(--cyan); background: rgba(0, 210, 255, 0.04); }
+
+    .hero {
+      position: relative;
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      padding: 132px 0 86px;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(5, 7, 10, 0.92), rgba(5, 7, 10, 0.64), rgba(5, 7, 10, 0.88)),
+        linear-gradient(180deg, rgba(5, 7, 10, 0.14), var(--void)),
+        url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1900&q=80") center / cover;
+      opacity: 0.9;
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.20;
+      background-image:
+        linear-gradient(rgba(0, 210, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 255, 0.08) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px 10px;
+      border: 1px solid rgba(0, 210, 255, 0.26);
+      border-radius: 999px;
+      background: rgba(0, 210, 255, 0.08);
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 14px var(--cyan);
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 840px;
+      margin: 0 auto 24px;
+      font-size: 56px;
+      line-height: 1.12;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+    .accent { color: var(--cyan); }
+    .lead {
+      max-width: 680px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.85;
+    }
+
+    .section {
+      position: relative;
+      padding: 92px 0;
+    }
+    .news-filter {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 42px;
+    }
+    .filter-btn {
+      min-height: 38px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.56);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+    .filter-btn:hover,
+    .filter-btn.active {
+      border-color: rgba(0, 210, 255, 0.4);
+      background: rgba(0, 210, 255, 0.08);
+      color: var(--cyan);
+    }
+
+    .featured {
+      display: grid;
+      grid-template-columns: 0.94fr 1.06fr;
+      gap: 34px;
+      align-items: center;
+      margin-bottom: 50px;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+    .featured-visual {
+      position: relative;
+      min-height: 290px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(0, 210, 255, 0.20);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 26% 26%, rgba(0, 210, 255, 0.18), transparent 12rem),
+        radial-gradient(circle at 78% 78%, rgba(145, 39, 255, 0.16), transparent 12rem),
+        rgba(5, 7, 10, 0.44);
+      overflow: hidden;
+      font-size: 70px;
+    }
+    .featured-label {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--cyan);
+      color: #001e27;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .category {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      margin-bottom: 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 210, 255, 0.24);
+      color: var(--cyan);
+      background: rgba(0, 210, 255, 0.08);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .category.corporate { color: var(--green); border-color: rgba(74, 222, 128, 0.26); background: rgba(74, 222, 128, 0.08); }
+    .category.partnership { color: var(--yellow); border-color: rgba(245, 158, 11, 0.28); background: rgba(245, 158, 11, 0.08); }
+    .category.event { color: var(--purple); border-color: rgba(145, 39, 255, 0.30); background: rgba(145, 39, 255, 0.08); }
+    .featured h2 {
+      margin-bottom: 14px;
+      font-size: 31px;
+      line-height: 1.32;
+    }
+    .featured p {
+      color: var(--muted);
+      line-height: 1.78;
+    }
+    .meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 20px;
+      color: var(--faint);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .meta-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .news-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+    .news-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 210, 255, 0.30);
+    }
+    .thumb {
+      min-height: 158px;
+      display: grid;
+      place-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(0, 210, 255, 0.13), transparent 9rem),
+        radial-gradient(circle at 78% 78%, rgba(145, 39, 255, 0.11), transparent 9rem),
+        rgba(5, 7, 10, 0.35);
+      font-size: 42px;
+    }
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 22px;
+    }
+    .card-title {
+      margin-bottom: 10px;
+      font-size: 18px;
+      line-height: 1.45;
+      font-weight: 850;
+    }
+    .card-excerpt {
+      flex: 1;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .card-meta {
+      color: var(--faint);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 20px;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .newsletter {
+      max-width: 900px;
+      margin: 72px auto 0;
+      padding: 52px 30px;
+      text-align: center;
+      border: 1px solid rgba(0, 210, 255, 0.16);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(0, 210, 255, 0.12), transparent 18rem),
+        radial-gradient(circle at 82% 80%, rgba(145, 39, 255, 0.13), transparent 18rem),
+        var(--panel);
+      backdrop-filter: blur(18px);
+    }
+    .newsletter h2 {
+      margin-bottom: 12px;
+      font-size: 32px;
+      line-height: 1.25;
+    }
+    .newsletter p {
+      max-width: 620px;
+      margin: 0 auto 24px;
+      color: var(--muted);
+    }
+    .newsletter-form {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .newsletter-form input {
+      flex: 1;
+      min-width: 0;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid rgba(133, 147, 153, 0.25);
+      border-radius: var(--radius);
+      outline: none;
+      background: rgba(5, 7, 10, 0.44);
+      color: var(--ink);
+    }
+
+    .footer {
+      padding: 70px 0 36px;
+      border-top: 1px solid var(--line);
+      background: #040608;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.3fr repeat(3, 1fr);
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+    .footer h3 { font-size: 14px; margin-bottom: 16px; }
+    .footer ul {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    .footer a, .footer p { color: var(--muted); font-size: 13px; }
+    .footer a:hover, .footer a.active { color: var(--cyan); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      color: var(--faint);
+      font-size: 12px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .container { width: min(100% - 40px, var(--container)); }
+      .nav-links, .lang { display: none; }
+      .menu-btn { display: grid; place-items: center; }
+      .nav.open .nav-links {
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        top: 82px;
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(5, 7, 10, 0.96);
+      }
+      .nav.open .nav-links a { padding: 12px; }
+      h1 { font-size: 42px; }
+      .featured, .news-grid, .footer-grid { grid-template-columns: repeat(2, 1fr); }
+      .featured { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { width: min(100% - 32px, var(--container)); }
+      .nav-inner { height: 66px; }
+      .nav-actions .btn { display: none; }
+      .hero { min-height: auto; padding-top: 116px; }
+      h1 { font-size: 34px; }
+      .lead { font-size: 16px; }
+      .news-grid, .footer-grid { grid-template-columns: 1fr; }
+      .section { padding: 74px 0; }
+      .newsletter-form { flex-direction: column; }
+      .footer-bottom { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <nav class="nav" id="nav">
+      <div class="container nav-inner">
+        <a class="brand" href="../index.html#top" aria-label="Suho Japan home">
+          <img class="brand-logo" src="../assets/suho-logo-white.png" alt="SUHO Japan" />
+        </a>
+        <div class="nav-links" id="navLinks">
+          <a href="../index.html#services">AI Solutions</a>
+          <a href="../index.html#cloud">Cloud Infra</a>
+          <a href="../index.html#managed">Managed Services</a>
+          <a href="../index.html#security">Security & Products</a>
+          <a href="../index.html#about">About</a>
+        </div>
+        <div class="nav-actions">
+          <span class="lang">JP/KR/EN</span>
+          <a class="btn btn-primary" href="../index.html#contact">Consult Experts</a>
+          <button class="menu-btn" type="button" aria-label="Toggle navigation" aria-expanded="false" id="menuBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <header class="hero">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="container hero-content">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>ニュース - News & Updates</div>
+          <h1>スホの最新情報<br /><span class="accent">お知らせ・プレスリリース</span></h1>
+          <p class="lead">製品アップデート、導入事例、受賞情報、イベントなど、株式会社スホの最新情報をお届けします。</p>
+        </div>
+      </header>
+
+      <section class="section">
+        <div class="container">
+          <div class="news-filter reveal" aria-label="News filters">
+            <button class="filter-btn active" type="button" data-filter="all">すべて</button>
+            <button class="filter-btn" type="button" data-filter="corporate">コーポレート</button>
+            <button class="filter-btn" type="button" data-filter="service">サービス</button>
+            <button class="filter-btn" type="button" data-filter="partnership">パートナーシップ</button>
+            <button class="filter-btn" type="button" data-filter="event">イベント</button>
+          </div>
+
+          <article class="featured reveal" data-category="partnership">
+            <div class="featured-visual">
+              🤝
+              <span class="featured-label">Featured</span>
+            </div>
+            <div>
+              <span class="category partnership">パートナーシップ</span>
+              <h2>韓国の非可視性ウォーターマーク先導企業「スナップタグ」と戦略的提携</h2>
+              <p>韓国の非可視性ウォーターマーク技術を持つスナップタグ社との戦略的提携を発表しました。デジタルコンテンツ保護と権利管理の強化を推進してまいります。</p>
+              <div class="meta"><span>2025.08.04</span><span class="meta-dot"></span><span>Partnership</span></div>
+              <a class="read-more" href="#">続きを読む →</a>
+            </div>
+          </article>
+
+          <div class="news-grid" id="newsGrid">
+            <article class="news-card reveal" data-category="corporate">
+              <div class="thumb">🏅</div>
+              <div class="card-body">
+                <span class="category corporate">コーポレート</span>
+                <div class="card-title">韓国ネイバークラウドMSPシルバーランク達成記念割引プロモーション開催</div>
+                <p class="card-excerpt">ネイバークラウドMSPシルバーランク達成を記念した特別割引プロモーションを実施いたします。</p>
+                <div class="card-meta">2025.04.22</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="corporate">
+              <div class="thumb">🎮</div>
+              <div class="card-body">
+                <span class="category corporate">コーポレート</span>
+                <div class="card-title">2025年度のゲーム事業計画を発表</div>
+                <p class="card-excerpt">2025年度における当社ゲーム事業の新たな方向性と計画についてご報告いたします。</p>
+                <div class="card-meta">2025.01.20</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="service">
+              <div class="thumb">🌏</div>
+              <div class="card-body">
+                <span class="category">サービス</span>
+                <div class="card-title">新たな収益創出への踏み出し『海外進出お任せサービス』をご紹介</div>
+                <p class="card-excerpt">海外市場への進出を全面的にサポートする新サービスを開始いたします。</p>
+                <div class="card-meta">2024.04.10</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="service">
+              <div class="thumb">💡</div>
+              <div class="card-body">
+                <span class="category">サービス</span>
+                <div class="card-title">豊富な経験と実績で、お客様の課題解決を支援するサービス</div>
+                <p class="card-excerpt">長年の実績と専門知識を活かし、お客様のビジネス課題を総合的に解決するサービスのご紹介です。</p>
+                <div class="card-meta">2024.02.22</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="service">
+              <div class="thumb">🛡️</div>
+              <div class="card-body">
+                <span class="category">サービス</span>
+                <div class="card-title">Webサイト脆弱性診断サービスが完全無料！ Webサイトの攻撃遮断サービス</div>
+                <p class="card-excerpt">Webサイトの脆弱性診断を無償で提供するキャンペーンを実施。サイバー攻撃からWebサイトを守ります。</p>
+                <div class="card-meta">2020.09.08</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="partnership">
+              <div class="thumb">🤝</div>
+              <div class="card-body">
+                <span class="category partnership">パートナーシップ</span>
+                <div class="card-title">株式会社スホ、韓国ネイバービジネスプラットフォームとパートナー契約を締結</div>
+                <p class="card-excerpt">韓国最大規模のITプラットフォーム企業、ネイバービジネスプラットフォームとの正式パートナー契約を締結しました。</p>
+                <div class="card-meta">2020.07.30</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="service">
+              <div class="thumb">📊</div>
+              <div class="card-body">
+                <span class="category">サービス</span>
+                <div class="card-title">Whatap ITモニタリングサービスを開始</div>
+                <p class="card-excerpt">システムの状態をリアルタイムで可視化するITモニタリングサービス「Whatap」の提供を開始しました。</p>
+                <div class="card-meta">2019.11.01</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="event">
+              <div class="thumb">🥽</div>
+              <div class="card-body">
+                <span class="category event">イベント</span>
+                <div class="card-title">東京ゲームショウ2017「GYRO VR」展示のご報告</div>
+                <p class="card-excerpt">東京ゲームショウ2017にてVRコンテンツ「GYRO VR」を出展いたしました。</p>
+                <div class="card-meta">2017.09.25</div>
+              </div>
+            </article>
+            <article class="news-card reveal" data-category="partnership">
+              <div class="thumb">🌐</div>
+              <div class="card-body">
+                <span class="category partnership">パートナーシップ</span>
+                <div class="card-title">株式会社スホがSDNプラットフォーム供給企業Aryakaとパートナー契約を締結</div>
+                <p class="card-excerpt">グローバルSDNプラットフォームのリーダー企業Aryakaとの正式パートナーシップを締結しました。</p>
+                <div class="card-meta">2016.10.27</div>
+              </div>
+            </article>
+          </div>
+
+          <div class="newsletter reveal">
+            <h2>最新情報を<span class="accent">メールで受け取る</span></h2>
+            <p>スホのプレスリリース、技術情報、イベント案内をいち早くお届けします。</p>
+            <form class="newsletter-form" id="newsletterForm">
+              <input type="email" placeholder="メールアドレスを入力" aria-label="メールアドレス" />
+              <button class="btn btn-primary" type="submit">登録する</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a class="brand" href="../index.html#top"><img class="brand-logo" src="../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+            <p>AIとクラウドの力で日本のビジネスを変革する</p>
+          </div>
+          <div>
+            <h3>Services</h3>
+            <ul>
+              <li><a href="../index.html#services">AI Service</a></li>
+              <li><a href="../index.html#cloud">Cloud Consulting</a></li>
+              <li><a href="../index.html#managed">Managed Service</a></li>
+              <li><a href="../index.html#security">Security & Products</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Company</h3>
+            <ul>
+              <li><a href="../index.html#about">About Us</a></li>
+              <li><a href="../recruit/">採用情報</a></li>
+              <li><a class="active" href="./">ニュース</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="../index.html#contact">プライバシーポリシー</a></li>
+              <li><a href="../index.html#contact">利用規約</a></li>
+              <li><a href="../index.html#contact">お問い合わせ</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>© 2026 株式会社スホ (Suho Corporation). All rights reserved.</span>
+          <span>Architectural Intelligence</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const nav = document.getElementById("nav");
+    const menuBtn = document.getElementById("menuBtn");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const newsItems = document.querySelectorAll(".news-card, .featured");
+    const newsletterForm = document.getElementById("newsletterForm");
+
+    menuBtn.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("open");
+      menuBtn.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.querySelectorAll(".nav-links a").forEach((link) => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+        menuBtn.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        filterButtons.forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const filter = button.dataset.filter;
+        newsItems.forEach((item) => {
+          item.classList.toggle("hidden", filter !== "all" && item.dataset.category !== filter);
+        });
+      });
+    });
+
+    newsletterForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const button = newsletterForm.querySelector("button");
+      const previous = button.textContent;
+      button.textContent = "登録されました";
+      setTimeout(() => {
+        button.textContent = previous;
+        newsletterForm.reset();
+      }, 1400);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+
+    document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+  </script>
+</body>
+</html>
