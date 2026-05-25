@@ -166,6 +166,7 @@ function validateArticle(value) {
     category: String(value.category || "corporate").trim(),
     date: String(value.date || "").trim(),
     excerpt: String(value.excerpt || "").trim(),
+    link: String(value.link || "").trim(),
     emoji: String(value.emoji || "📰").trim(),
     image: String(value.image || "").trim(),
     featured: Boolean(value.featured)
@@ -176,6 +177,14 @@ function validateArticle(value) {
   }
   if (!["corporate", "service", "partnership", "event"].includes(article.category)) {
     throw httpError("invalid category", 400);
+  }
+  if (article.link) {
+    try {
+      const url = new URL(article.link);
+      if (!["http:", "https:"].includes(url.protocol)) throw new Error("invalid protocol");
+    } catch {
+      throw httpError("invalid link", 400);
+    }
   }
   if (article.image) {
     if (!/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(article.image)) {

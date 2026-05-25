@@ -321,6 +321,10 @@
               <label for="excerpt">本文概要</label>
               <textarea id="excerpt" required></textarea>
             </div>
+            <div class="field">
+              <label for="link">続きを読む URL</label>
+              <input id="link" type="url" placeholder="https://example.com/news/article" />
+            </div>
             <label class="check"><input id="featured" type="checkbox" /> Featured記事にする</label>
             <div class="actions">
               <button class="btn btn-primary" type="submit">保存する</button>
@@ -469,6 +473,7 @@
       imageData.value = article.image || "";
       setImagePreview(article.image || "");
       document.getElementById("excerpt").value = article.excerpt;
+      document.getElementById("link").value = article.link || "";
       document.getElementById("featured").checked = Boolean(article.featured);
       setMessage(formMessage, "編集中です。", "ok");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -491,6 +496,7 @@
         emoji: document.getElementById("emoji").value || "📰",
         image: imageData.value,
         excerpt: document.getElementById("excerpt").value,
+        link: document.getElementById("link").value.trim(),
         featured: document.getElementById("featured").checked
       };
     }

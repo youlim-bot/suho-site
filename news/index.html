@@ -867,7 +867,7 @@
             <h2>${escapeHtml(featured.title)}</h2>
             <p>${escapeHtml(featured.excerpt)}</p>
             <div class="meta"><span>${escapeHtml(featured.date)}</span><span class="meta-dot"></span><span>${escapeHtml(categoryLabels[featured.category] || featured.category)}</span></div>
-            <a class="read-more" href="#">続きを読む →</a>
+            ${readMoreLink(featured)}
           </div>
         `;
       } else {
@@ -917,6 +917,11 @@
         return `<img src="${escapeAttribute(article.image)}" alt="${escapeAttribute(`${altPrefix}: ${article.title}`)}" loading="lazy" />`;
       }
       return escapeHtml(article.emoji || "📰");
+    }
+
+    function readMoreLink(article) {
+      if (!article.link) return "";
+      return `<a class="read-more" href="${escapeAttribute(article.link)}" target="_blank" rel="noopener noreferrer">続きを読む →</a>`;
     }
 
     function escapeHtml(value) {
