@@ -1,0 +1,26 @@
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site
+        run: |
+          mkdir -p /tmp/suho-site-pages/assets
+          cp index.html /tmp/suho-site-pages/index.html
+          cp assets/suho-logo-white.png /tmp/suho-site-pages/assets/suho-logo-white.png
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: e3c3fecc26006293f0130c4a5967b62d
+          command: pages deploy /tmp/suho-site-pages --project-name=suho-site --branch=main
