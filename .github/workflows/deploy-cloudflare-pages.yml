@@ -15,8 +15,10 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p /tmp/suho-site-pages/assets
+          mkdir -p /tmp/suho-site-pages/recruit
           cp index.html /tmp/suho-site-pages/index.html
           cp assets/suho-logo-white.png /tmp/suho-site-pages/assets/suho-logo-white.png
+          cp recruit/index.html /tmp/suho-site-pages/recruit/index.html
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
