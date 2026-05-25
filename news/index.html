@@ -252,7 +252,6 @@
       align-items: center;
       min-height: 28px;
       padding: 0 10px;
-      margin-bottom: 14px;
       border-radius: 6px;
       border: 1px solid rgba(0, 210, 255, 0.24);
       color: var(--cyan);
@@ -373,8 +372,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      flex-wrap: wrap;
+      gap: 10px 14px;
       margin-top: auto;
+    }
+    .card-footer .category {
+      margin-right: auto;
+      margin-bottom: 0;
     }
     .card-footer .read-more {
       margin-top: 0;
@@ -890,10 +894,10 @@
         <article class="news-card reveal visible" data-category="${escapeHtml(article.category)}">
           <div class="thumb">${mediaMarkup(article, "ニュース画像")}</div>
           <div class="card-body">
-            ${categoryBadge(article.category)}
             <div class="card-title">${escapeHtml(article.title)}</div>
             <p class="card-excerpt">${escapeHtml(article.excerpt)}</p>
             <div class="card-footer">
+              ${categoryBadge(article.category)}
               <div class="card-meta">${escapeHtml(article.date)}</div>
               ${readMoreLink(article)}
             </div>
