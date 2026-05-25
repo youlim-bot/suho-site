@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>沿革管理 | SUHO Japan</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root {
+      --void: #05070a;
+      --ink: #e8edf0;
+      --muted: #aeb9bf;
+      --faint: #75858e;
+      --cyan: #00d2ff;
+      --green: #4ade80;
+      --danger: #ff6b6b;
+      --panel: rgba(15, 23, 42, 0.72);
+      --line: rgba(133, 147, 153, 0.24);
+      --radius: 8px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
+        radial-gradient(circle at 84% 22%, rgba(145, 39, 255, 0.12), transparent 28rem),
+        var(--void);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+    .container { width: min(100% - 40px, 1180px); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(5,7,10,.82);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: inline-flex; align-items: center; width: 150px; min-height: 44px; }
+    .brand-logo { width: 150px; height: 44px; object-fit: contain; }
+    .admin-badge {
+      padding: 6px 10px;
+      border: 1px solid rgba(0,210,255,.24);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0,210,255,.08);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    main { padding: 54px 0 90px; }
+    h1 { margin: 0 0 12px; font-size: 38px; line-height: 1.2; }
+    h2 { margin: 0; font-size: 20px; }
+    .lead { margin: 0 0 30px; color: var(--muted); }
+    .panel {
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+    .login {
+      max-width: 520px;
+      margin: 58px auto 0;
+      padding: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: .82fr 1.18fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .form {
+      padding: 24px;
+      position: sticky;
+      top: 94px;
+    }
+    .list { padding: 18px; }
+    label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    input, textarea {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(133,147,153,.25);
+      border-radius: var(--radius);
+      outline: none;
+      background: rgba(5,7,10,.46);
+      color: var(--ink);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    textarea { min-height: 132px; resize: vertical; }
+    input:focus, textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,210,255,.14);
+    }
+    .field { margin-bottom: 16px; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .btn-primary { background: var(--cyan); color: #001e27; }
+    .btn-ghost { border-color: rgba(0,210,255,.30); background: rgba(0,210,255,.05); color: var(--cyan); }
+    .btn-danger { border-color: rgba(255,107,107,.34); background: rgba(255,107,107,.08); color: var(--danger); }
+    .actions, .toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .toolbar { justify-content: space-between; margin-bottom: 16px; }
+    .message { min-height: 22px; margin-top: 12px; color: var(--muted); font-size: 13px; }
+    .message.ok { color: var(--green); }
+    .message.error { color: var(--danger); }
+    .history-item {
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: var(--radius);
+      background: rgba(5,7,10,.28);
+    }
+    .history-item + .history-item { margin-top: 12px; }
+    .history-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+    .history-date {
+      color: var(--cyan);
+      font-size: 18px;
+      font-weight: 950;
+    }
+    .history-content { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .form { position: static; }
+    }
+    @media (max-width: 580px) {
+      .container { width: min(100% - 28px, 1180px); }
+      .row { grid-template-columns: 1fr; }
+      .topbar-inner { height: 66px; }
+      h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="../../index.html#top"><img class="brand-logo" src="../../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+      <span class="admin-badge">History Admin</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section id="loginPanel" class="panel login">
+        <h1>沿革管理</h1>
+        <p class="lead">管理者パスワードでログインしてください。</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="password">管理者パスワード</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button class="btn btn-primary" type="submit">ログイン</button>
+          <div id="loginMessage" class="message"></div>
+        </form>
+      </section>
+
+      <section id="adminPanel" class="hidden">
+        <h1>沿革管理</h1>
+        <p class="lead">年、月、内容を登録、編集、削除できます。保存後すぐに沿革ページへ反映されます。</p>
+        <div class="grid">
+          <form id="historyForm" class="panel form">
+            <input id="historyId" type="hidden" />
+            <div class="row">
+              <div class="field">
+                <label for="year">年</label>
+                <input id="year" inputmode="numeric" placeholder="2026" required />
+              </div>
+              <div class="field">
+                <label for="month">月</label>
+                <input id="month" inputmode="numeric" placeholder="05" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="content">内容</label>
+              <textarea id="content" required></textarea>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" type="submit">保存する</button>
+              <button class="btn btn-ghost" type="button" id="newButton">新規作成</button>
+              <button class="btn btn-ghost" type="button" id="logoutButton">ログアウト</button>
+            </div>
+            <div id="formMessage" class="message"></div>
+          </form>
+
+          <div class="panel list">
+            <div class="toolbar">
+              <h2>沿革一覧</h2>
+              <button class="btn btn-ghost" type="button" id="refreshButton">再読み込み</button>
+            </div>
+            <div id="historyList"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const tokenKey = "suho_news_admin_token";
+    let historyItems = [];
+
+    const loginPanel = document.getElementById("loginPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginForm = document.getElementById("loginForm");
+    const loginMessage = document.getElementById("loginMessage");
+    const historyForm = document.getElementById("historyForm");
+    const formMessage = document.getElementById("formMessage");
+    const historyList = document.getElementById("historyList");
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage(loginMessage, "ログイン中...");
+      try {
+        const result = await api("/login", {
+          method: "POST",
+          body: JSON.stringify({ password: document.getElementById("password").value })
+        }, false);
+        sessionStorage.setItem(tokenKey, result.token);
+        setMessage(loginMessage, "ログインしました。", "ok");
+        await showAdmin();
+      } catch (error) {
+        setMessage(loginMessage, "ログインに失敗しました。", "error");
+      }
+    });
+
+    historyForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        const id = document.getElementById("historyId").value;
+        const result = await api(id ? `/history/${encodeURIComponent(id)}` : "/history", {
+          method: id ? "PUT" : "POST",
+          body: JSON.stringify(readForm())
+        });
+        historyItems = result.history;
+        clearForm();
+        renderList();
+        setMessage(formMessage, "保存しました。", "ok");
+      } catch (error) {
+        setMessage(formMessage, error.message || "保存に失敗しました。", "error");
+      }
+    });
+
+    document.getElementById("newButton").addEventListener("click", clearForm);
+    document.getElementById("refreshButton").addEventListener("click", loadHistory);
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      sessionStorage.removeItem(tokenKey);
+      adminPanel.classList.add("hidden");
+      loginPanel.classList.remove("hidden");
+    });
+
+    async function showAdmin() {
+      loginPanel.classList.add("hidden");
+      adminPanel.classList.remove("hidden");
+      await loadHistory();
+    }
+
+    async function loadHistory() {
+      const result = await api("/history", {}, false);
+      historyItems = result.history || [];
+      renderList();
+    }
+
+    function renderList() {
+      historyList.innerHTML = historyItems.length ? historyItems.map((item) => `
+        <article class="history-item">
+          <div class="history-head">
+            <div class="history-date">${escapeHtml(item.year)}.${escapeHtml(item.month)}</div>
+          </div>
+          <div class="history-content">${escapeHtml(item.content)}</div>
+          <div class="actions">
+            <button class="btn btn-ghost" type="button" data-edit="${escapeAttribute(item.id)}">編集</button>
+            <button class="btn btn-danger" type="button" data-delete="${escapeAttribute(item.id)}">削除</button>
+          </div>
+        </article>
+      `).join("") : `<p class="history-content">沿革がありません。</p>`;
+
+      historyList.querySelectorAll("[data-edit]").forEach((button) => {
+        button.addEventListener("click", () => editItem(button.dataset.edit));
+      });
+      historyList.querySelectorAll("[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => deleteItem(button.dataset.delete));
+      });
+    }
+
+    function editItem(id) {
+      const item = historyItems.find((entry) => entry.id === id);
+      if (!item) return;
+      document.getElementById("historyId").value = item.id;
+      document.getElementById("year").value = item.year;
+      document.getElementById("month").value = item.month;
+      document.getElementById("content").value = item.content;
+      setMessage(formMessage, "編集中です。", "ok");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteItem(id) {
+      if (!confirm("この沿革を削除しますか？")) return;
+      const result = await api(`/history/${encodeURIComponent(id)}`, { method: "DELETE" });
+      historyItems = result.history;
+      renderList();
+      setMessage(formMessage, "削除しました。", "ok");
+    }
+
+    function readForm() {
+      return {
+        id: document.getElementById("historyId").value,
+        year: document.getElementById("year").value,
+        month: document.getElementById("month").value,
+        content: document.getElementById("content").value
+      };
+    }
+
+    function clearForm() {
+      historyForm.reset();
+      document.getElementById("historyId").value = "";
+      setMessage(formMessage, "");
+    }
+
+    async function api(path, options = {}, authorized = true) {
+      const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+      if (authorized) headers.Authorization = `Bearer ${sessionStorage.getItem(tokenKey) || ""}`;
+      const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || "Request failed");
+      return body;
+    }
+
+    function setMessage(element, text, type = "") {
+      element.textContent = text;
+      element.className = `message ${type}`.trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    if (sessionStorage.getItem(tokenKey)) showAdmin();
+  </script>
+</body>
+</html>

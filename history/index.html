@@ -428,6 +428,7 @@
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
     const timeline = document.getElementById("timeline");
+    const HISTORY_API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
     const historyItems = [
       { year: "2025", events: [
         ["10", ["SCONAI株式会社 AI音声通訳技術事業MOU契約"]],
@@ -549,6 +550,8 @@
       ] }
     ];
 
+    let historyEntries = flattenHistory(historyItems);
+
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
       menuBtn.setAttribute("aria-expanded", String(isOpen));
@@ -561,20 +564,6 @@
       });
     });
 
-    timeline.innerHTML = historyItems.map((group) => `
-      <section class="year-block reveal">
-        <div class="year">${escapeHtml(group.year)}</div>
-        <div class="events">
-          ${group.events.map(([month, details]) => `
-            <article class="event">
-              <div class="month">${escapeHtml(month)}</div>
-              <div class="details">${details.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
-            </article>
-          `).join("")}
-        </div>
-      </section>
-    `).join("");
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -584,7 +573,62 @@
       });
     }, { threshold: 0.12 });
 
-    document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+    loadHistory();
+
+    async function loadHistory() {
+      try {
+        const response = await fetch(`${HISTORY_API_URL}/history`);
+        const data = await response.json();
+        if (Array.isArray(data.history) && data.history.length) historyEntries = data.history;
+      } catch (error) {
+        historyEntries = flattenHistory(historyItems);
+      }
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const grouped = groupHistory(historyEntries);
+      timeline.innerHTML = grouped.map((group) => `
+        <section class="year-block reveal">
+          <div class="year">${escapeHtml(group.year)}</div>
+          <div class="events">
+            ${group.events.map((event) => `
+              <article class="event">
+                <div class="month">${escapeHtml(event.month)}</div>
+                <div class="details">${event.details.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      `).join("");
+      document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+    }
+
+    function flattenHistory(groups) {
+      return groups.flatMap((group) => group.events.flatMap(([month, details], eventIndex) => (
+        details.map((content, detailIndex) => ({
+          id: `${group.year}-${month}-${eventIndex}-${detailIndex}`,
+          year: group.year,
+          month,
+          content
+        }))
+      )));
+    }
+
+    function groupHistory(entries) {
+      const sorted = [...entries].sort((a, b) => `${b.year}.${b.month}`.localeCompare(`${a.year}.${a.month}`));
+      const yearMap = new Map();
+      sorted.forEach((item) => {
+        if (!yearMap.has(item.year)) yearMap.set(item.year, new Map());
+        const monthMap = yearMap.get(item.year);
+        if (!monthMap.has(item.month)) monthMap.set(item.month, []);
+        monthMap.get(item.month).push(item.content);
+      });
+      return [...yearMap.entries()].map(([year, monthMap]) => ({
+        year,
+        events: [...monthMap.entries()].map(([month, details]) => ({ month, details }))
+      }));
+    }
 
     function escapeHtml(value) {
       return String(value || "").replace(/[&<>"']/g, (char) => ({

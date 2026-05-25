@@ -1,4 +1,5 @@
 const ARTICLES_KEY = "articles";
+const HISTORY_KEY = "history";
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
 
 const DEFAULT_ARTICLES = [
@@ -95,6 +96,10 @@ export default {
         return json({ articles: await getArticles(env) });
       }
 
+      if (request.method === "GET" && path === "/history") {
+        return json({ history: await getHistory(env) });
+      }
+
       if (request.method === "POST" && path === "/login") {
         const body = await request.json().catch(() => ({}));
         const hash = await sha256(String(body.password || ""));
@@ -140,6 +145,42 @@ export default {
         }
       }
 
+      if (path === "/history" && request.method === "PUT") {
+        await requireAdmin(request, env);
+        const body = await request.json();
+        const history = validateHistory(body.history);
+        await env.NEWS_KV.put(HISTORY_KEY, JSON.stringify(history));
+        return json({ history });
+      }
+
+      if (path === "/history" && request.method === "POST") {
+        await requireAdmin(request, env);
+        const item = validateHistoryItem(await request.json());
+        const history = await getHistory(env);
+        const next = sortHistory([{ ...item, id: item.id || crypto.randomUUID() }, ...history]);
+        await env.NEWS_KV.put(HISTORY_KEY, JSON.stringify(next));
+        return json({ history: next });
+      }
+
+      if (path.startsWith("/history/")) {
+        await requireAdmin(request, env);
+        const id = decodeURIComponent(path.split("/").pop());
+        const history = await getHistory(env);
+
+        if (request.method === "PUT") {
+          const updated = validateHistoryItem({ ...(await request.json()), id });
+          const next = sortHistory(history.map((item) => item.id === id ? updated : item));
+          await env.NEWS_KV.put(HISTORY_KEY, JSON.stringify(next));
+          return json({ history: next });
+        }
+
+        if (request.method === "DELETE") {
+          const next = history.filter((item) => item.id !== id);
+          await env.NEWS_KV.put(HISTORY_KEY, JSON.stringify(next));
+          return json({ history: next });
+        }
+      }
+
       return json({ error: "Not found" }, 404);
     } catch (error) {
       const status = error.status || 500;
@@ -152,6 +193,11 @@ async function getArticles(env) {
   const stored = await env.NEWS_KV.get(ARTICLES_KEY, "json");
   const articles = Array.isArray(stored) ? stored : DEFAULT_ARTICLES;
   return articles.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+}
+
+async function getHistory(env) {
+  const stored = await env.NEWS_KV.get(HISTORY_KEY, "json");
+  return sortHistory(Array.isArray(stored) ? stored : []);
 }
 
 function validateArticles(value) {
@@ -195,6 +241,33 @@ function validateArticle(value) {
     }
   }
   return article;
+}
+
+function validateHistory(value) {
+  if (!Array.isArray(value)) throw httpError("history must be an array", 400);
+  return sortHistory(value.map(validateHistoryItem));
+}
+
+function validateHistoryItem(value) {
+  const item = {
+    id: String(value.id || crypto.randomUUID()),
+    year: String(value.year || "").trim(),
+    month: String(value.month || "").trim().padStart(2, "0"),
+    content: String(value.content || "").trim()
+  };
+
+  if (!/^\d{4}$/.test(item.year)) throw httpError("invalid year", 400);
+  if (!/^(0[1-9]|1[0-2])$/.test(item.month)) throw httpError("invalid month", 400);
+  if (!item.content) throw httpError("content is required", 400);
+  return item;
+}
+
+function sortHistory(history) {
+  return [...history].sort((a, b) => {
+    const left = `${b.year}.${b.month}`;
+    const right = `${a.year}.${a.month}`;
+    return left.localeCompare(right);
+  });
 }
 
 async function requireAdmin(request, env) {
