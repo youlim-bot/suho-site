@@ -65,6 +65,17 @@
         linear-gradient(180deg, rgba(6, 9, 13, 0.94) 0%, rgba(5, 7, 10, 0.86) 48%, rgba(7, 16, 16, 0.90) 100%);
     }
 
+    .starlight-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      opacity: 0.62;
+      mix-blend-mode: screen;
+    }
+
     main,
     .footer {
       position: relative;
@@ -1118,6 +1129,7 @@
 </head>
 <body>
   <div class="site-shell">
+    <canvas class="starlight-canvas" id="starlightCanvas" aria-hidden="true"></canvas>
     <nav class="nav" id="nav">
       <div class="container nav-inner">
         <a class="brand" href="#top" aria-label="Suho Japan home">
@@ -1491,6 +1503,88 @@
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
     const contactForm = document.getElementById("contactForm");
+    const starlightCanvas = document.getElementById("starlightCanvas");
+
+    function initStarlight() {
+      if (!starlightCanvas) return;
+
+      const context = starlightCanvas.getContext("2d");
+      if (!context) return;
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const pointer = { x: 0, y: 0 };
+      const target = { x: 0, y: 0 };
+      let width = 0;
+      let height = 0;
+      let pixelRatio = 1;
+      let stars = [];
+
+      function createStars() {
+        const count = window.innerWidth < 720 ? 240 : 520;
+        stars = Array.from({ length: count }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: 0.46 + Math.random() * 0.92,
+          alpha: 0.24 + Math.random() * 0.42,
+          speed: 0.055 + Math.random() * 0.16,
+          depth: 0.35 + Math.random() * 1.15,
+          color: Math.random() > 0.72 ? "145, 39, 255" : (Math.random() > 0.18 ? "0, 210, 255" : "232, 237, 240")
+        }));
+      }
+
+      function resizeStarlight() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        starlightCanvas.width = Math.floor(width * pixelRatio);
+        starlightCanvas.height = Math.floor(height * pixelRatio);
+        starlightCanvas.style.width = `${width}px`;
+        starlightCanvas.style.height = `${height}px`;
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        createStars();
+      }
+
+      function onPointerMove(event) {
+        target.x = (event.clientX / width - 0.5) * 14;
+        target.y = (event.clientY / height - 0.5) * 14;
+      }
+
+      function drawStarlight() {
+        if (!reduceMotion) requestAnimationFrame(drawStarlight);
+
+        pointer.x += (target.x - pointer.x) * 0.035;
+        pointer.y += (target.y - pointer.y) * 0.035;
+        context.clearRect(0, 0, width, height);
+
+        stars.forEach((star) => {
+          star.y += star.speed * star.depth;
+          if (star.y > height + 8) {
+            star.y = -8;
+            star.x = Math.random() * width;
+          }
+
+          const x = star.x + pointer.x * star.depth;
+          const y = star.y + pointer.y * star.depth;
+          const glowRadius = star.radius * 3.1;
+          const glow = context.createRadialGradient(x, y, 0, x, y, glowRadius);
+          glow.addColorStop(0, `rgba(${star.color}, ${star.alpha})`);
+          glow.addColorStop(0.34, `rgba(${star.color}, ${star.alpha * 0.42})`);
+          glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+          context.fillStyle = glow;
+          context.beginPath();
+          context.arc(x, y, glowRadius, 0, Math.PI * 2);
+          context.fill();
+        });
+      }
+
+      window.addEventListener("mousemove", onPointerMove, { passive: true });
+      window.addEventListener("resize", resizeStarlight);
+      resizeStarlight();
+      drawStarlight();
+    }
+
+    initStarlight();
 
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
