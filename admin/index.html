@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理ダッシュボード | SUHO Japan</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root {
+      --void: #05070a;
+      --ink: #e8edf0;
+      --muted: #aeb9bf;
+      --faint: #75858e;
+      --cyan: #00d2ff;
+      --purple: #9127ff;
+      --green: #4ade80;
+      --danger: #ff6b6b;
+      --panel: rgba(15, 23, 42, 0.72);
+      --line: rgba(133, 147, 153, 0.24);
+      --radius: 8px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
+        radial-gradient(circle at 84% 22%, rgba(145, 39, 255, 0.12), transparent 28rem),
+        var(--void);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .container {
+      width: min(100% - 40px, 1280px);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 7, 10, 0.84);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      width: 150px;
+      min-height: 44px;
+    }
+
+    .brand-logo {
+      width: 150px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .admin-badge {
+      padding: 6px 10px;
+      border: 1px solid rgba(0, 210, 255, 0.24);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0, 210, 255, 0.08);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    main { padding: 54px 0 90px; }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 38px;
+      line-height: 1.2;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 0 0 30px;
+      color: var(--muted);
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+
+    .login {
+      max-width: 520px;
+      margin: 58px auto 0;
+      padding: 30px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    input {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(133, 147, 153, 0.25);
+      border-radius: var(--radius);
+      outline: none;
+      background: rgba(5, 7, 10, 0.46);
+      color: var(--ink);
+    }
+
+    input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.14);
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #001e27;
+    }
+
+    .btn-ghost {
+      border-color: rgba(0, 210, 255, 0.34);
+      color: var(--cyan);
+      background: rgba(0, 210, 255, 0.04);
+    }
+
+    .message {
+      min-height: 22px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .message.ok { color: var(--green); }
+    .message.error { color: var(--danger); }
+
+    .dashboard-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid rgba(0, 210, 255, 0.32);
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.66);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .tab.active {
+      border-color: var(--cyan);
+      background: var(--cyan);
+      color: #001923;
+      box-shadow: 0 14px 28px rgba(0, 210, 255, 0.18);
+    }
+
+    .frame-shell {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: rgba(5, 7, 10, 0.32);
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: min(1160px, calc(100vh - 190px));
+      min-height: 760px;
+      border: 0;
+      background: var(--void);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 720px) {
+      .container { width: min(100% - 28px, 1280px); }
+      .topbar-inner { height: 66px; }
+      h1 { font-size: 30px; }
+      .dashboard-head { align-items: start; flex-direction: column; }
+      iframe { min-height: 900px; height: 900px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="../index.html#top"><img class="brand-logo" src="../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+      <span class="admin-badge">Unified Admin</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section id="loginPanel" class="panel login">
+        <h1>管理ダッシュボード</h1>
+        <p class="lead">ニュース、沿革、Security & Productsを一か所で管理できます。</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="password">管理者パスワード</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button class="btn btn-primary" type="submit">ログイン</button>
+          <div id="loginMessage" class="message"></div>
+        </form>
+      </section>
+
+      <section id="dashboardPanel" class="hidden">
+        <div class="dashboard-head">
+          <div>
+            <h1>管理ダッシュボード</h1>
+            <p class="lead">上のタブから編集対象を切り替えてください。保存内容は公開ページへ反映されます。</p>
+          </div>
+          <button class="btn btn-ghost" type="button" id="logoutButton">ログアウト</button>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Admin sections">
+          <button class="tab active" type="button" data-admin-tab="news">ニュース</button>
+          <button class="tab" type="button" data-admin-tab="history">沿革</button>
+          <button class="tab" type="button" data-admin-tab="products">Security & Products</button>
+        </div>
+
+        <div class="frame-shell">
+          <iframe id="adminFrame" title="管理画面" src="about:blank"></iframe>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const tokenKey = "suho_news_admin_token";
+    const pages = {
+      news: "news/",
+      history: "history/",
+      products: "products/"
+    };
+
+    const loginPanel = document.getElementById("loginPanel");
+    const dashboardPanel = document.getElementById("dashboardPanel");
+    const loginForm = document.getElementById("loginForm");
+    const loginMessage = document.getElementById("loginMessage");
+    const adminFrame = document.getElementById("adminFrame");
+    const tabs = document.querySelectorAll("[data-admin-tab]");
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage(loginMessage, "ログイン中...");
+      try {
+        const result = await api("/login", {
+          method: "POST",
+          body: JSON.stringify({ password: document.getElementById("password").value })
+        });
+        sessionStorage.setItem(tokenKey, result.token);
+        setMessage(loginMessage, "ログインしました。", "ok");
+        showDashboard(currentTab());
+      } catch (error) {
+        setMessage(loginMessage, "ログインに失敗しました。", "error");
+      }
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => showDashboard(tab.dataset.adminTab));
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      sessionStorage.removeItem(tokenKey);
+      adminFrame.src = "about:blank";
+      dashboardPanel.classList.add("hidden");
+      loginPanel.classList.remove("hidden");
+      location.hash = "";
+    });
+
+    function showDashboard(tabName = "news") {
+      const safeTab = pages[tabName] ? tabName : "news";
+      loginPanel.classList.add("hidden");
+      dashboardPanel.classList.remove("hidden");
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.adminTab === safeTab));
+      adminFrame.src = pages[safeTab];
+      location.hash = safeTab;
+    }
+
+    function currentTab() {
+      const hash = location.hash.replace("#", "");
+      return pages[hash] ? hash : "news";
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(`${API_URL}${path}`, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || "Request failed");
+      return body;
+    }
+
+    function setMessage(element, text, type = "") {
+      element.textContent = text;
+      element.className = `message ${type}`.trim();
+    }
+
+    if (sessionStorage.getItem(tokenKey)) showDashboard(currentTab());
+  </script>
+</body>
+</html>
