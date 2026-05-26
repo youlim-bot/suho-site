@@ -72,7 +72,7 @@
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      opacity: 0.62;
+      opacity: 0.86;
       mix-blend-mode: screen;
     }
 
@@ -1520,12 +1520,12 @@
       let stars = [];
 
       function createStars() {
-        const count = window.innerWidth < 720 ? 240 : 520;
+        const count = window.innerWidth < 720 ? 380 : 820;
         stars = Array.from({ length: count }, () => ({
           x: Math.random() * width,
           y: Math.random() * height,
-          radius: 0.46 + Math.random() * 0.92,
-          alpha: 0.24 + Math.random() * 0.42,
+          radius: 0.72 + Math.random() * 1.45,
+          alpha: 0.38 + Math.random() * 0.52,
           speed: 0.055 + Math.random() * 0.16,
           depth: 0.35 + Math.random() * 1.15,
           color: Math.random() > 0.72 ? "145, 39, 255" : (Math.random() > 0.18 ? "0, 210, 255" : "232, 237, 240")
@@ -1565,7 +1565,7 @@
 
           const x = star.x + pointer.x * star.depth;
           const y = star.y + pointer.y * star.depth;
-          const glowRadius = star.radius * 3.1;
+          const glowRadius = star.radius * 4.2;
           const glow = context.createRadialGradient(x, y, 0, x, y, glowRadius);
           glow.addColorStop(0, `rgba(${star.color}, ${star.alpha})`);
           glow.addColorStop(0.34, `rgba(${star.color}, ${star.alpha * 0.42})`);
