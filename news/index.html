@@ -38,11 +38,28 @@
     button, input { font: inherit; }
 
     .site-shell {
+      position: relative;
       min-height: 100vh;
+      overflow: hidden;
       background:
         radial-gradient(circle at 12% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
         radial-gradient(circle at 84% 22%, rgba(145, 39, 255, 0.12), transparent 28rem),
         linear-gradient(180deg, #06090d 0%, #05070a 46%, #071010 100%);
+    }
+    .starlight-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 360ms ease;
+    }
+    .starlight-canvas.is-visible { opacity: 0.9; }
+    main, .footer {
+      position: relative;
+      z-index: 1;
     }
     .container { width: min(100% - 48px, var(--container)); margin: 0 auto; }
 
@@ -521,6 +538,7 @@
 </head>
 <body>
   <div class="site-shell">
+    <canvas class="starlight-canvas" id="starlightCanvas" aria-hidden="true"></canvas>
     <nav class="nav" id="nav">
       <div class="container nav-inner">
         <a class="brand" href="../index.html#top" aria-label="Suho Japan home">
@@ -715,6 +733,7 @@
     </footer>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script>
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
@@ -801,6 +820,85 @@
     let articles = defaultArticles;
     let currentFilter = "all";
     let currentPage = 1;
+
+    function initStarlight() {
+      const canvas = document.getElementById("starlightCanvas");
+      if (!canvas || !window.THREE) return;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 1000);
+      camera.position.set(0, 0, 5);
+
+      const COUNT = 3000;
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(COUNT * 3);
+      const col = new Float32Array(COUNT * 3);
+      const palette = [
+        new THREE.Color("#6366f1"),
+        new THREE.Color("#06b6d4"),
+        new THREE.Color("#a855f7"),
+        new THREE.Color("#ffffff"),
+      ];
+
+      for (let i = 0; i < COUNT; i += 1) {
+        pos[i * 3] = (Math.random() - 0.5) * 20;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 20;
+        const c = palette[Math.floor(Math.random() * palette.length)];
+        col[i * 3] = c.r;
+        col[i * 3 + 1] = c.g;
+        col[i * 3 + 2] = c.b;
+      }
+
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+      const mat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.8 });
+      scene.add(new THREE.Points(geo, mat));
+
+      let mouseX = 0;
+      let mouseY = 0;
+
+      document.addEventListener("mousemove", (event) => {
+        mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      function updateStarlightVisibility() {
+        const hero = document.querySelector(".hero");
+        if (!hero) return;
+        const heroBottom = hero.offsetTop + hero.offsetHeight;
+        canvas.classList.toggle("is-visible", window.scrollY > heroBottom - 120);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = performance.now() * 0.001;
+        camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.03;
+        camera.position.y += (-mouseY * 0.2 - camera.position.y) * 0.03;
+        scene.rotation.y = t * 0.02;
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      window.addEventListener("resize", () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+        updateStarlightVisibility();
+      });
+
+      window.addEventListener("scroll", updateStarlightVisibility, { passive: true });
+      updateStarlightVisibility();
+    }
+
+    initStarlight();
 
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
