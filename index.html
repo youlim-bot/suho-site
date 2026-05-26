@@ -623,7 +623,7 @@
 
     .product-grid {
       display: grid;
-      grid-template-columns: 1.1fr 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
 
@@ -649,6 +649,65 @@
       color: var(--muted);
       font-size: 11px;
       font-weight: 800;
+    }
+
+    .product-tabs {
+      margin-top: 34px;
+    }
+
+    .product-tab-nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .product-tab {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid rgba(0, 210, 255, 0.32);
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.66);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .product-tab:hover,
+    .product-tab:focus-visible {
+      border-color: rgba(0, 210, 255, 0.72);
+      color: var(--text);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .product-tab.active {
+      border-color: var(--cyan);
+      background: var(--cyan);
+      color: #001923;
+      box-shadow: 0 14px 28px rgba(0, 210, 255, 0.18);
+    }
+
+    .product-tab-panel {
+      display: none;
+    }
+
+    .product-tab-panel.active {
+      display: block;
+    }
+
+    .partner-card {
+      min-height: 150px;
+    }
+
+    .partner-card .badge {
+      position: static;
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 18px;
     }
 
     .about-grid {
@@ -1199,30 +1258,71 @@
           <div class="section-head reveal" style="text-align:center;margin-left:auto;margin-right:auto">
             <div class="section-kicker">04 - Security & Products</div>
             <h2>セキュリティ＆プロダクト</h2>
+            <p class="muted">ゼロトラストセキュリティから業界特化ソリューション、パートナー製品まで、課題に合わせた導入を支援します。</p>
           </div>
-          <div class="product-grid">
-            <article class="card tall reveal">
-              <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-              <h3>SUHO DataPlatform</h3>
-              <p>企業データを一元管理するクラウドネイティブなデータプラットフォーム。リアルタイム分析からMLまで対応します。</p>
-              <div class="chips"><span class="chip">データ基盤</span><span class="chip">リアルタイム分析</span></div>
-            </article>
-            <article class="card reveal">
-              <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.5 3 7.7 7 9 4-1.3 7-4.5 7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-              <h3>SUHO SecureEdge</h3>
-              <p>ゼロトラストモデルに基づいた包括的なセキュリティプラットフォーム。</p>
-            </article>
-            <article class="card reveal">
-              <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l4 3V8l4 3V5h8v15H4zm10-4h2m-7 0h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <h3>製造業</h3>
-              <p>スマートファクトリー実現に向けたIoT基盤とAIによる品質管理・予知保全。</p>
-            </article>
-            <article class="card wide reveal">
-              <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h8v8H8zM12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2m0-14-2 2M7 17l-2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <h3>SUHO AI Studio</h3>
-              <p>ノーコード/ローコードでAIモデルを開発・デプロイできるMLOpsプラットフォーム。</p>
-              <div class="chips"><span class="chip">MLOps</span><span class="chip">No Code</span><span class="chip">In Beta</span></div>
-            </article>
+          <div class="product-tabs reveal">
+            <div class="product-tab-nav" role="tablist" aria-label="Security and product categories">
+              <button class="product-tab active" type="button" role="tab" aria-selected="true" data-product-tab="platform">プラットフォーム</button>
+              <button class="product-tab" type="button" role="tab" aria-selected="false" data-product-tab="industry">業界別ソリューション</button>
+              <button class="product-tab" type="button" role="tab" aria-selected="false" data-product-tab="partner">パートナー製品</button>
+            </div>
+
+            <div class="product-tab-panel active" data-product-panel="platform">
+              <div class="product-grid">
+                <article class="card">
+                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                  <h3>SUHO DataPlatform</h3>
+                  <p>企業データを一元管理するクラウドネイティブなデータプラットフォーム。リアルタイム分析からMLまで対応します。</p>
+                  <div class="chips"><span class="chip">データ基盤</span><span class="chip">リアルタイム分析</span><span class="chip">ML Pipeline</span></div>
+                </article>
+                <article class="card">
+                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.5 3 7.7 7 9 4-1.3 7-4.5 7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                  <h3>SUHO SecureEdge</h3>
+                  <p>ゼロトラストセキュリティモデルに基づいた包括的なセキュリティプラットフォーム。クラウド・オンプレ両対応です。</p>
+                  <div class="chips"><span class="chip">ゼロトラスト</span><span class="chip">SIEM</span><span class="chip">SOC連携</span></div>
+                </article>
+                <article class="card">
+                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h8v8H8zM12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2m0-14-2 2M7 17l-2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <h3>SUHO AI Studio</h3>
+                  <p>ノーコード/ローコードでAIモデルを開発・デプロイできるMLOpsプラットフォーム。専門知識不要で始められます。</p>
+                  <div class="chips"><span class="chip">MLOps</span><span class="chip">ノーコードAI</span><span class="chip">自動学習</span></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="product-tab-panel" data-product-panel="industry">
+              <div class="product-grid">
+                <article class="card">
+                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21V8a5 5 0 0 1 10 0v13M5 21h14M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <h3>医療・ヘルスケア</h3>
+                  <p>電子カルテ連携AIから医療画像診断支援まで、医療DXを包括的にサポートします。</p>
+                  <div class="chips"><span class="chip">電子カルテ</span><span class="chip">診断支援AI</span><span class="chip">HIPAA対応</span></div>
+                </article>
+                <article class="card">
+                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l4 3V8l4 3V5h8v15H4zm10-4h2m-7 0h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <h3>製造業</h3>
+                  <p>スマートファクトリー実現に向けたIoT基盤とAIによる品質管理・予知保全ソリューション。</p>
+                  <div class="chips"><span class="chip">スマートファクトリー</span><span class="chip">予知保全</span><span class="chip">IoT</span></div>
+                </article>
+                <article class="card">
+                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M6 7v13h12V7M9 11h6M9 15h4M8 4h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <h3>金融・フィンテック</h3>
+                  <p>不正検知AIからリスク分析まで、金融規制に準拠したセキュアなクラウドソリューションを提供します。</p>
+                  <div class="chips"><span class="chip">不正検知</span><span class="chip">リスク分析</span><span class="chip">FSA対応</span></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="product-tab-panel" data-product-panel="partner">
+              <div class="product-grid">
+                <article class="card partner-card"><h3>Microsoft</h3><p>クラウド、ライセンス、業務基盤の導入から運用まで支援します。</p><span class="badge">Gold Partner</span></article>
+                <article class="card partner-card"><h3>AWS</h3><p>クラウドインフラの設計、移行、運用最適化を支援します。</p><span class="badge">Advanced Tier</span></article>
+                <article class="card partner-card"><h3>Google Cloud</h3><p>データ活用とクラウド基盤構築を組み合わせた導入支援を行います。</p><span class="badge">Premier Partner</span></article>
+                <article class="card partner-card"><h3>Salesforce</h3><p>顧客管理と業務プロセス改善を見据えた導入をサポートします。</p><span class="badge">Consulting Partner</span></article>
+                <article class="card partner-card"><h3>ServiceNow</h3><p>IT運用管理とサービス管理の効率化を支援します。</p><span class="badge">Technology Partner</span></article>
+                <article class="card partner-card"><h3>Datadog</h3><p>監視、可観測性、インシデント対応の運用品質向上を支えます。</p><span class="badge">Technology Partner</span></article>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1386,6 +1486,25 @@
       link.addEventListener("click", () => {
         nav.classList.remove("open");
         menuBtn.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    const productTabs = document.querySelectorAll("[data-product-tab]");
+    const productPanels = document.querySelectorAll("[data-product-panel]");
+
+    productTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.productTab;
+
+        productTabs.forEach((item) => {
+          const isActive = item === tab;
+          item.classList.toggle("active", isActive);
+          item.setAttribute("aria-selected", String(isActive));
+        });
+
+        productPanels.forEach((panel) => {
+          panel.classList.toggle("active", panel.dataset.productPanel === target);
+        });
       });
     });
 
