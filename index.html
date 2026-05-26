@@ -2027,10 +2027,11 @@
         await sendEmailJs(EMAILJS_CONFIG.inquiryTemplateId, inquiryParams);
 
         if (EMAILJS_CONFIG.autoReplyTemplateId) {
+          await wait(1200);
           await sendEmailJs(EMAILJS_CONFIG.autoReplyTemplateId, {
             ...inquiryParams,
             to_email: values.email,
-            reply_to: CONTACT_EMAIL
+            reply_to: values.email
           });
         }
 
@@ -2063,12 +2064,12 @@
         blockList: {
           list: ["test@test.com"],
           watchVariable: "from_email"
-        },
-        limitRate: {
-          id: "suho-contact-form",
-          throttle: 10000
         }
       });
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
     }
 
     function setContactMessage(message, type) {
