@@ -21,7 +21,7 @@ jobs:
           mkdir -p /tmp/suho-site-pages/admin/news
           mkdir -p /tmp/suho-site-pages/admin/history
           cp index.html /tmp/suho-site-pages/index.html
-          cp assets/suho-logo-white.png /tmp/suho-site-pages/assets/suho-logo-white.png
+          cp assets/* /tmp/suho-site-pages/assets/
           cp recruit/index.html /tmp/suho-site-pages/recruit/index.html
           cp news/index.html /tmp/suho-site-pages/news/index.html
           cp history/index.html /tmp/suho-site-pages/history/index.html

@@ -496,12 +496,30 @@
     }
 
     .logos {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       justify-content: center;
-      gap: 48px;
+      align-items: center;
+      gap: 18px;
       margin-top: 56px;
-      color: rgba(232, 237, 240, 0.46);
-      font-weight: 900;
+    }
+
+    .logo-card {
+      min-height: 86px;
+      display: grid;
+      place-items: center;
+      padding: 18px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius);
+      background: rgba(15, 23, 42, 0.42);
+      backdrop-filter: blur(14px);
+    }
+
+    .logo-card img {
+      width: 100%;
+      max-width: 220px;
+      height: 48px;
+      object-fit: contain;
     }
 
     .ops-layout {
@@ -943,6 +961,7 @@
 
       .stats,
       .cloud-grid,
+      .logos,
       .product-grid,
       .footer-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -987,6 +1006,7 @@
       .stats,
       .cards,
       .cloud-grid,
+      .logos,
       .product-grid,
       .about-stats,
       .contact-form,
@@ -1004,8 +1024,7 @@
       }
 
       .logos {
-        gap: 22px;
-        flex-wrap: wrap;
+        gap: 12px;
       }
 
       .footer-bottom {
@@ -1115,7 +1134,7 @@
           <div class="section-head reveal">
             <div class="section-kicker">02 - Cloud Consulting</div>
             <h2>クラウドで実現する<br />スケーラブルな未来</h2>
-            <p>AWS・Azure・GCPのマルチクラウド戦略から移行支援、コスト最適化まで、クラウドジャーニーの全てをサポートします。</p>
+            <p>AWS・NAVER CLOUD PLATFORM・NHN Cloudのマルチクラウド戦略から移行支援、コスト最適化まで、クラウドジャーニーの全てをサポートします。</p>
           </div>
           <div class="cloud-grid">
             <article class="plain-feature reveal">
@@ -1132,7 +1151,9 @@
             </article>
           </div>
           <div class="logos reveal" aria-label="Cloud platforms">
-            <span>AWS</span><span>Azure</span><span>GCP</span>
+            <div class="logo-card"><img src="assets/logo-aws.svg" alt="AWS" /></div>
+            <div class="logo-card"><img src="assets/logo-naver-cloud.svg" alt="NAVER CLOUD PLATFORM" /></div>
+            <div class="logo-card"><img src="assets/logo-nhn-cloud.svg" alt="NHN Cloud" /></div>
           </div>
         </div>
       </section>

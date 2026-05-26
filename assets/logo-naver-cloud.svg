@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" role="img" aria-labelledby="title">
+  <title id="title">NAVER CLOUD PLATFORM</title>
+  <rect width="260" height="64" rx="8" fill="none"/>
+  <g transform="translate(18 18)">
+    <rect width="28" height="28" rx="4" fill="#03c75a"/>
+    <path d="M7 7h6.2l8 11.6V7H21v14h-6.1L7 9.5V21H7z" fill="#fff"/>
+  </g>
+  <text x="58" y="29" fill="#f4f7fb" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="800" letter-spacing=".4">NAVER CLOUD</text>
+  <text x="58" y="47" fill="#9aa6ad" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">PLATFORM</text>
+</svg>
