@@ -302,7 +302,24 @@
               </div>
               <div class="field">
                 <label for="genre">ジャンル</label>
-                <input id="genre" placeholder="例: ゼロトラスト / MSP / WAF" required />
+                <select id="genre" required>
+                  <option value="データ基盤">データ基盤</option>
+                  <option value="セキュリティ">セキュリティ</option>
+                  <option value="ゼロトラスト">ゼロトラスト</option>
+                  <option value="AI/ML">AI/ML</option>
+                  <option value="MLOps">MLOps</option>
+                  <option value="医療DX">医療DX</option>
+                  <option value="製造DX">製造DX</option>
+                  <option value="金融DX">金融DX</option>
+                  <option value="MSP">MSP</option>
+                  <option value="WAF">WAF</option>
+                  <option value="CDN">CDN</option>
+                  <option value="監視・運用">監視・運用</option>
+                  <option value="パートナー製品">パートナー製品</option>
+                  <option value="Gold Partner">Gold Partner</option>
+                  <option value="Advanced Tier">Advanced Tier</option>
+                  <option value="Technology Partner">Technology Partner</option>
+                </select>
               </div>
             </div>
             <div class="field">
@@ -473,6 +490,7 @@
       document.getElementById("productId").value = product.id;
       document.getElementById("title").value = product.title;
       document.getElementById("category").value = product.category;
+      ensureGenreOption(product.genre);
       document.getElementById("genre").value = product.genre;
       imageFile.value = "";
       logoData.value = product.logo || "";
@@ -512,6 +530,12 @@
       logoData.value = "";
       setImagePreview("");
       setMessage(formMessage, "");
+    }
+
+    function ensureGenreOption(value) {
+      const genre = document.getElementById("genre");
+      if (!value || [...genre.options].some((option) => option.value === value)) return;
+      genre.add(new Option(value, value));
     }
 
     function setImagePreview(src) {
