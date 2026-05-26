@@ -14,19 +14,13 @@ jobs:
 
       - name: Prepare static site
         run: |
-          mkdir -p /tmp/suho-site-pages/assets
-          mkdir -p /tmp/suho-site-pages/recruit
-          mkdir -p /tmp/suho-site-pages/news
-          mkdir -p /tmp/suho-site-pages/history
-          mkdir -p /tmp/suho-site-pages/admin/news
-          mkdir -p /tmp/suho-site-pages/admin/history
+          mkdir -p /tmp/suho-site-pages
           cp index.html /tmp/suho-site-pages/index.html
-          cp assets/* /tmp/suho-site-pages/assets/
-          cp recruit/index.html /tmp/suho-site-pages/recruit/index.html
-          cp news/index.html /tmp/suho-site-pages/news/index.html
-          cp history/index.html /tmp/suho-site-pages/history/index.html
-          cp admin/news/index.html /tmp/suho-site-pages/admin/news/index.html
-          cp admin/history/index.html /tmp/suho-site-pages/admin/history/index.html
+          cp -R assets /tmp/suho-site-pages/assets
+          cp -R recruit /tmp/suho-site-pages/recruit
+          cp -R news /tmp/suho-site-pages/news
+          cp -R history /tmp/suho-site-pages/history
+          cp -R admin /tmp/suho-site-pages/admin
 
       - name: Deploy News API Worker
         uses: cloudflare/wrangler-action@v3

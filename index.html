@@ -186,6 +186,12 @@
       box-shadow: 0 0 24px rgba(0, 210, 255, 0.18);
     }
 
+    .btn[disabled] {
+      cursor: progress;
+      opacity: 0.72;
+      transform: none;
+    }
+
     .btn-ghost {
       border-color: rgba(0, 210, 255, 0.34);
       color: var(--cyan);
@@ -1076,6 +1082,31 @@
       text-align: center;
     }
 
+    .form-message {
+      min-height: 22px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .form-message.ok {
+      color: var(--green);
+    }
+
+    .form-message.error {
+      color: #ff7b7b;
+    }
+
+    .form-trap {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
     .footer {
       padding: 70px 0 36px;
       border-top: 1px solid var(--line);
@@ -1541,9 +1572,13 @@
           <h2>さあ、始めましょう</h2>
           <p class="muted">ビジネスのデジタル変革について、まずはお気軽にご相談ください。<br /><span class="accent">contact@suhojapan.com</span></p>
           <form class="contact-form" id="contactForm">
+            <div class="form-trap" aria-hidden="true">
+              <label for="website">Web site</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
             <div>
               <label for="name">お名前</label>
-              <input id="name" name="name" type="text" placeholder="山田 太郎" />
+              <input id="name" name="name" type="text" placeholder="山田 太郎" required />
             </div>
             <div>
               <label for="topic">ご相談内容</label>
@@ -1561,14 +1596,15 @@
             </div>
             <div>
               <label for="email">メールアドレス</label>
-              <input id="email" name="email" type="email" placeholder="example@suho.com" />
+              <input id="email" name="email" type="email" placeholder="example@suho.com" required />
             </div>
             <div class="form-full">
               <label for="message">メッセージ</label>
-              <textarea id="message" name="message" placeholder="プロジェクトの概要や具体的な課題についてご記入ください"></textarea>
+              <textarea id="message" name="message" placeholder="プロジェクトの概要や具体的な課題についてご記入ください" required></textarea>
             </div>
             <div class="form-full">
               <button class="btn btn-primary" type="submit">送信する</button>
+              <div class="form-message" id="contactMessage" role="status" aria-live="polite"></div>
             </div>
           </form>
         </div>
@@ -1618,11 +1654,20 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
     const contactForm = document.getElementById("contactForm");
-    const NEWS_API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const contactMessage = document.getElementById("contactMessage");
+    const NEWS_API_URL = getStoredConfig("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const EMAILJS_CONFIG = {
+      publicKey: getStoredConfig("suho_emailjs_public_key") || "zBxltHXlWQt9glOPD",
+      serviceId: getStoredConfig("suho_emailjs_service_id") || "service_vpyqf6m",
+      inquiryTemplateId: getStoredConfig("suho_emailjs_inquiry_template_id") || "template_c0fn0j5",
+      autoReplyTemplateId: getStoredConfig("suho_emailjs_autoreply_template_id") || "template_h8z5xb7"
+    };
+    const CONTACT_EMAIL = "contact@suhojapan.com";
     const defaultClientLogos = [
       ["KDDI", "assets/logos/KDDI.png", 180],
       ["NEXON", "assets/logos/넥슨.webp", 130],
@@ -1938,16 +1983,106 @@
       return escapeHtml(String(product.title || "S").trim().charAt(0).toUpperCase());
     }
 
-    contactForm.addEventListener("submit", (event) => {
+    contactForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const button = contactForm.querySelector("button[type='submit']");
       const previous = button.textContent;
-      button.textContent = "送信されました";
-      setTimeout(() => {
-        button.textContent = previous;
+      const formData = new FormData(contactForm);
+
+      if (String(formData.get("website") || "").trim()) return;
+      if (!isEmailJsConfigured()) {
+        setContactMessage("EmailJSの設定が完了していません。", "error");
+        return;
+      }
+
+      const values = {
+        name: String(formData.get("name") || "").trim(),
+        company: String(formData.get("company") || "").trim(),
+        email: String(formData.get("email") || "").trim(),
+        topic: String(formData.get("topic") || "").trim(),
+        message: String(formData.get("message") || "").trim()
+      };
+
+      if (!values.name || !values.email || !values.message) {
+        setContactMessage("お名前、メールアドレス、メッセージを入力してください。", "error");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "送信中...";
+      setContactMessage("", "");
+
+      try {
+        const inquiryParams = {
+          to_email: CONTACT_EMAIL,
+          reply_to: values.email,
+          from_name: values.name,
+          from_email: values.email,
+          company: values.company || "未入力",
+          topic: values.topic,
+          message: values.message,
+          submitted_at: new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
+        };
+
+        await sendEmailJs(EMAILJS_CONFIG.inquiryTemplateId, inquiryParams);
+
+        if (EMAILJS_CONFIG.autoReplyTemplateId) {
+          await sendEmailJs(EMAILJS_CONFIG.autoReplyTemplateId, {
+            ...inquiryParams,
+            to_email: values.email,
+            reply_to: CONTACT_EMAIL
+          });
+        }
+
+        setContactMessage("送信されました。ご入力のメールアドレスへ受付完了メールを送信しました。", "ok");
         contactForm.reset();
-      }, 1400);
+      } catch (error) {
+        setContactMessage("送信に失敗しました。時間をおいて再度お試しください。", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = previous;
+      }
     });
+
+    function isEmailJsConfigured() {
+      return Boolean(
+        window.emailjs &&
+        EMAILJS_CONFIG.publicKey &&
+        EMAILJS_CONFIG.serviceId &&
+        EMAILJS_CONFIG.inquiryTemplateId &&
+        !EMAILJS_CONFIG.publicKey.startsWith("YOUR_") &&
+        !EMAILJS_CONFIG.serviceId.startsWith("YOUR_") &&
+        !EMAILJS_CONFIG.inquiryTemplateId.startsWith("YOUR_")
+      );
+    }
+
+    function sendEmailJs(templateId, params) {
+      return window.emailjs.send(EMAILJS_CONFIG.serviceId, templateId, params, {
+        publicKey: EMAILJS_CONFIG.publicKey,
+        blockHeadless: true,
+        blockList: {
+          list: ["test@test.com"],
+          watchVariable: "from_email"
+        },
+        limitRate: {
+          id: "suho-contact-form",
+          throttle: 10000
+        }
+      });
+    }
+
+    function setContactMessage(message, type) {
+      contactMessage.textContent = message;
+      contactMessage.className = `form-message${type ? ` ${type}` : ""}`;
+    }
+
+    function getStoredConfig(key) {
+      try {
+        return window.localStorage ? window.localStorage.getItem(key) : "";
+      } catch (error) {
+        return "";
+      }
+    }
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
