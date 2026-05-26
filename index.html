@@ -2027,17 +2027,22 @@
         await sendEmailJs(EMAILJS_CONFIG.inquiryTemplateId, inquiryParams);
 
         if (EMAILJS_CONFIG.autoReplyTemplateId) {
-          await wait(1200);
-          await sendEmailJs(EMAILJS_CONFIG.autoReplyTemplateId, {
-            ...inquiryParams,
-            to_email: values.email,
-            reply_to: values.email
-          });
+          try {
+            await wait(1500);
+            await sendEmailJs(EMAILJS_CONFIG.autoReplyTemplateId, {
+              ...inquiryParams,
+              to_email: values.email,
+              reply_to: values.email
+            });
+          } catch (autoReplyError) {
+            console.warn("EmailJS auto-reply failed", autoReplyError);
+          }
         }
 
-        setContactMessage("送信されました。ご入力のメールアドレスへ受付完了メールを送信しました。", "ok");
+        setContactMessage("送信されました。お問い合わせありがとうございます。", "ok");
         contactForm.reset();
       } catch (error) {
+        console.error("EmailJS inquiry failed", error);
         setContactMessage("送信に失敗しました。時間をおいて再度お試しください。", "error");
       } finally {
         button.disabled = false;
