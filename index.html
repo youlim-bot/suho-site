@@ -65,17 +65,6 @@
         linear-gradient(180deg, rgba(6, 9, 13, 0.94) 0%, rgba(5, 7, 10, 0.86) 48%, rgba(7, 16, 16, 0.90) 100%);
     }
 
-    .starlight-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      opacity: 0.96;
-      mix-blend-mode: screen;
-    }
-
     main,
     .footer {
       position: relative;
@@ -1129,14 +1118,13 @@
 </head>
 <body>
   <div class="site-shell">
-    <canvas class="starlight-canvas" id="starlightCanvas" aria-hidden="true"></canvas>
     <nav class="nav" id="nav">
       <div class="container nav-inner">
         <a class="brand" href="#top" aria-label="Suho Japan home">
           <img class="brand-logo" src="assets/suho-logo-white.png" alt="SUHO Japan" />
         </a>
         <div class="nav-links" id="navLinks">
-          <a href="#services">AI Solutions</a>
+          <a href="#services">AI Innovation</a>
           <a href="#cloud">Cloud Infra</a>
           <a href="#managed">Managed Services</a>
           <a href="#security">Security & Products</a>
@@ -1185,7 +1173,7 @@
       <section class="section" id="services">
         <div class="container split">
           <div class="section-head reveal">
-            <div class="section-kicker">01 - AI Service</div>
+            <div class="section-kicker">01 - AI Innovation</div>
             <h2>AI活用で実現する<br />業務変革と効率化</h2>
             <p>Local LLMの導入支援から、業務課題に合わせたAIソリューションの選定・設計・運用まで、現場で使える形で導入をサポートします。</p>
           </div>
@@ -1430,7 +1418,7 @@
             <div>
               <label for="topic">ご相談内容</label>
               <select id="topic" name="topic">
-                <option>AI Service</option>
+                <option>AI Innovation</option>
                 <option>Cloud Consulting</option>
                 <option>Managed Service</option>
                 <option>Security & Products</option>
@@ -1467,7 +1455,7 @@
           <div>
             <h3>Services</h3>
             <ul>
-              <li><a href="#services">AI Service</a></li>
+              <li><a href="#services">AI Innovation</a></li>
               <li><a href="#cloud">Cloud Consulting</a></li>
               <li><a href="#managed">Managed Service</a></li>
               <li><a href="#security">Security & Products</a></li>
@@ -1499,189 +1487,10 @@
     </footer>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script>
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
     const contactForm = document.getElementById("contactForm");
-    const starlightCanvas = document.getElementById("starlightCanvas");
-
-    function initCanvasStarlight() {
-      if (!starlightCanvas) return;
-
-      const context = starlightCanvas.getContext("2d");
-      if (!context) return;
-
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const pointer = { x: 0, y: 0 };
-      const target = { x: 0, y: 0 };
-      let width = 0;
-      let height = 0;
-      let pixelRatio = 1;
-      let stars = [];
-
-      function buildStars() {
-        const count = window.innerWidth < 720 ? 150 : 260;
-        stars = Array.from({ length: count }, () => ({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          z: 0.25 + Math.random() * 1.35,
-          radius: 1.05 + Math.random() * 2.1,
-          alpha: 0.52 + Math.random() * 0.48,
-          hue: Math.random() > 0.72 ? "145, 39, 255" : "0, 210, 255",
-          drift: 0.12 + Math.random() * 0.28
-        }));
-      }
-
-      function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-        starlightCanvas.width = Math.floor(width * pixelRatio);
-        starlightCanvas.height = Math.floor(height * pixelRatio);
-        starlightCanvas.style.width = `${width}px`;
-        starlightCanvas.style.height = `${height}px`;
-        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        buildStars();
-      }
-
-      function onPointerMove(event) {
-        target.x = (event.clientX / width - 0.5) * 18;
-        target.y = (event.clientY / height - 0.5) * 18;
-      }
-
-      function animate() {
-        if (!prefersReducedMotion) requestAnimationFrame(animate);
-
-        pointer.x += (target.x - pointer.x) * 0.035;
-        pointer.y += (target.y - pointer.y) * 0.035;
-
-        context.clearRect(0, 0, width, height);
-        stars.forEach((star) => {
-          star.y += star.drift * star.z;
-          if (star.y > height + 12) {
-            star.y = -12;
-            star.x = Math.random() * width;
-          }
-
-          const x = star.x + pointer.x * star.z;
-          const y = star.y + pointer.y * star.z;
-          const glow = context.createRadialGradient(x, y, 0, x, y, star.radius * 5.2);
-          glow.addColorStop(0, `rgba(${star.hue}, ${star.alpha})`);
-          glow.addColorStop(0.42, `rgba(${star.hue}, ${star.alpha * 0.34})`);
-          glow.addColorStop(1, "rgba(0, 0, 0, 0)");
-          context.fillStyle = glow;
-          context.beginPath();
-          context.arc(x, y, star.radius * 5.2, 0, Math.PI * 2);
-          context.fill();
-        });
-      }
-
-      window.addEventListener("mousemove", onPointerMove, { passive: true });
-      window.addEventListener("resize", resize);
-      resize();
-      animate();
-    }
-
-    function initStarlight() {
-      if (!starlightCanvas) return;
-      if (!window.THREE) {
-        initCanvasStarlight();
-        return;
-      }
-
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const renderer = new THREE.WebGLRenderer({
-        canvas: starlightCanvas,
-        alpha: true,
-        antialias: true,
-        preserveDrawingBuffer: true
-      });
-      renderer.setClearColor(0x000000, 0);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
-      camera.position.set(0, 0, 7);
-
-      const mouse = { x: 0, y: 0 };
-      const target = { x: 0, y: 0 };
-
-      const starCount = window.innerWidth < 720 ? 980 : 1800;
-      const starGeometry = new THREE.BufferGeometry();
-      const starPositions = new Float32Array(starCount * 3);
-      const starColors = new Float32Array(starCount * 3);
-      const palette = [
-        new THREE.Color("#00d2ff"),
-        new THREE.Color("#47d6ff"),
-        new THREE.Color("#9127ff"),
-        new THREE.Color("#e8edf0")
-      ];
-
-      for (let i = 0; i < starCount; i += 1) {
-        const radius = 8 + Math.random() * 22;
-        const angle = Math.random() * Math.PI * 2;
-        const drift = (Math.random() - 0.5) * 9;
-        starPositions[i * 3] = Math.cos(angle) * radius;
-        starPositions[i * 3 + 1] = Math.sin(angle) * radius * 0.56 + drift;
-        starPositions[i * 3 + 2] = (Math.random() - 0.5) * 18;
-
-        const color = palette[Math.floor(Math.random() * palette.length)];
-        const dim = 0.72 + Math.random() * 0.58;
-        starColors[i * 3] = color.r * dim;
-        starColors[i * 3 + 1] = color.g * dim;
-        starColors[i * 3 + 2] = color.b * dim;
-      }
-
-      starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-      starGeometry.setAttribute("color", new THREE.BufferAttribute(starColors, 3));
-
-      const stars = new THREE.Points(
-        starGeometry,
-        new THREE.PointsMaterial({
-          size: 0.075,
-          vertexColors: true,
-          transparent: true,
-          opacity: 0.98,
-          depthWrite: false
-        })
-      );
-      scene.add(stars);
-
-      function resize() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        renderer.setSize(width, height, false);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-      }
-
-      function onPointerMove(event) {
-        target.x = (event.clientX / window.innerWidth - 0.5) * 2;
-        target.y = (event.clientY / window.innerHeight - 0.5) * 2;
-      }
-
-      window.addEventListener("mousemove", onPointerMove, { passive: true });
-      window.addEventListener("resize", resize);
-      resize();
-
-      function animate() {
-        if (!prefersReducedMotion) requestAnimationFrame(animate);
-
-        const time = performance.now() * 0.001;
-        mouse.x += (target.x - mouse.x) * 0.045;
-        mouse.y += (target.y - mouse.y) * 0.045;
-
-        stars.rotation.y = time * 0.018 + mouse.x * 0.055;
-        stars.rotation.x = mouse.y * 0.025;
-
-        renderer.render(scene, camera);
-      }
-
-      animate();
-    }
-
-    initStarlight();
 
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
