@@ -76,7 +76,7 @@ Recommended HTML:
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%; max-width:600px; background-color:#ffffff; border:1px solid #e5e5e5; border-radius:8px; overflow:hidden;">
           <tr>
             <td style="background-color:#05070a; color:#ffffff; padding:22px 32px;">
-              <img src="https://suho-site.pages.dev/assets/suho-logo-white.png" alt="SUHO Japan" style="display:block; width:150px; max-width:150px; height:auto; border:0;" />
+              <img src="https://suho-site.pages.dev/assets/email-logo.png" alt="SUHO Japan" style="display:block; width:180px; max-width:180px; height:auto; border:0;" />
             </td>
           </tr>
           <tr>
