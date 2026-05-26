@@ -354,7 +354,6 @@
     .stats {
       padding: 54px 0;
       border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 24px;
@@ -372,6 +371,50 @@
       color: var(--muted);
       font-size: 13px;
       font-weight: 700;
+    }
+
+    .client-logo-marquee {
+      position: relative;
+      overflow: hidden;
+      padding: 44px 0 58px;
+      border-bottom: 1px solid var(--line);
+      mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    }
+
+    .client-logo-track {
+      display: flex;
+      width: max-content;
+      animation: logoMarquee 46s linear infinite;
+    }
+
+    .client-logo-set {
+      display: flex;
+      align-items: center;
+      gap: 54px;
+      padding-right: 54px;
+      flex: 0 0 auto;
+    }
+
+    .client-logo-set img {
+      height: 44px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
+      flex: 0 0 auto;
+      opacity: 1;
+      filter:
+        drop-shadow(0 0 1px rgba(255, 255, 255, 0.62))
+        drop-shadow(0 0 16px rgba(0, 210, 255, 0.10));
+    }
+
+    @keyframes logoMarquee {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
     }
 
     .section-head {
@@ -1172,6 +1215,20 @@
         gap: 12px;
       }
 
+      .client-logo-marquee {
+        padding: 34px 0 46px;
+      }
+
+      .client-logo-set {
+        gap: 34px;
+        padding-right: 34px;
+      }
+
+      .client-logo-set img {
+        height: 36px;
+        max-width: 140px;
+      }
+
       .footer-bottom {
         flex-direction: column;
       }
@@ -1183,6 +1240,10 @@
       *::after {
         scroll-behavior: auto;
         transition-duration: 0.01ms !important;
+      }
+
+      .client-logo-track {
+        animation: none;
       }
     }
   </style>
@@ -1238,6 +1299,56 @@
             <div class="stat"><b>15年</b><span>実績</span></div>
             <div class="stat"><b>99.9%</b><span>稼働率</span></div>
             <div class="stat"><b>150+</b><span>支援実績</span></div>
+          </div>
+          <div class="client-logo-marquee reveal" aria-label="Client and partner logos">
+            <div class="client-logo-track">
+              <div class="client-logo-set">
+                <img src="assets/logos/KDDI.png" alt="KDDI" />
+                <img src="assets/logos/넥슨.webp" alt="NEXON" />
+                <img src="assets/logos/바로크.png" alt="BAROQUE" />
+                <img src="assets/logos/현대해상보험.png" alt="Hyundai Marine & Fire Insurance" />
+                <img src="assets/logos/kocca.png" alt="KOCCA" />
+                <img src="assets/logos/현대.png" alt="Hyundai" />
+                <img src="assets/logos/소프트뱅크.png" alt="SoftBank" />
+                <img src="assets/logos/삼성.png" alt="Samsung" />
+                <img src="assets/logos/KT.png" alt="KT" />
+                <img src="assets/logos/삼성전기.png" alt="Samsung Electro-Mechanics" />
+                <img src="assets/logos/삼성 SDS.webp" alt="Samsung SDS" />
+                <img src="assets/logos/문화원.webp" alt="Korean Cultural Center" />
+                <img src="assets/logos/펜타시큐리티.png" alt="Penta Security" />
+                <img src="assets/logos/핑크퐁 재팬.png" alt="Pinkfong Japan" />
+                <img src="assets/logos/넷마블 재팬.png" alt="Netmarble Japan" />
+                <img src="assets/logos/ADK.png" alt="ADK" />
+                <img src="assets/logos/쿼드마이너.png" alt="Quad Miners" />
+                <img src="assets/logos/하쿠호도.png" alt="Hakuhodo" />
+                <img src="assets/logos/마블러스.png" alt="Marvelous" />
+                <img src="assets/logos/네이버 클라우드3.png" alt="NAVER Cloud" />
+                <img src="assets/logos/GS 네오텍.png" alt="GS Neotek" />
+              </div>
+              <div class="client-logo-set" aria-hidden="true">
+                <img src="assets/logos/KDDI.png" alt="" />
+                <img src="assets/logos/넥슨.webp" alt="" />
+                <img src="assets/logos/바로크.png" alt="" />
+                <img src="assets/logos/현대해상보험.png" alt="" />
+                <img src="assets/logos/kocca.png" alt="" />
+                <img src="assets/logos/현대.png" alt="" />
+                <img src="assets/logos/소프트뱅크.png" alt="" />
+                <img src="assets/logos/삼성.png" alt="" />
+                <img src="assets/logos/KT.png" alt="" />
+                <img src="assets/logos/삼성전기.png" alt="" />
+                <img src="assets/logos/삼성 SDS.webp" alt="" />
+                <img src="assets/logos/문화원.webp" alt="" />
+                <img src="assets/logos/펜타시큐리티.png" alt="" />
+                <img src="assets/logos/핑크퐁 재팬.png" alt="" />
+                <img src="assets/logos/넷마블 재팬.png" alt="" />
+                <img src="assets/logos/ADK.png" alt="" />
+                <img src="assets/logos/쿼드마이너.png" alt="" />
+                <img src="assets/logos/하쿠호도.png" alt="" />
+                <img src="assets/logos/마블러스.png" alt="" />
+                <img src="assets/logos/네이버 클라우드3.png" alt="" />
+                <img src="assets/logos/GS 네오텍.png" alt="" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
