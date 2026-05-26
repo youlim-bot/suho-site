@@ -29,7 +29,7 @@ Use these template variables:
 - `{{from_name}}`: visitor name
 - `{{from_email}}`: visitor email
 - `{{company}}`: company name
-- `{{topic}}`: selected topic
+- `{{inquiry_type}}`: selected inquiry type
 - `{{message}}`: message body
 - `{{submitted_at}}`: submitted date/time
 
@@ -38,7 +38,7 @@ Recommended EmailJS settings:
 - To Email: `{{to_email}}`
 - Reply-To: `{{reply_to}}`
 - From Name: `SUHO Japan Web Form`
-- Subject: `[SUHO Japan] お問い合わせ: {{topic}}`
+- Subject: `[SUHO Japan] お問い合わせ: {{inquiry_type}}`
 
 ## Auto-reply template
 
