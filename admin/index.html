@@ -244,7 +244,7 @@
     <div class="container">
       <section id="loginPanel" class="panel login">
         <h1>管理ダッシュボード</h1>
-        <p class="lead">ニュース、沿革、Security & Productsを一か所で管理できます。</p>
+        <p class="lead">ニュース、沿革、Security & Products、ロゴ電光板を一か所で管理できます。</p>
         <form id="loginForm">
           <div class="field">
             <label for="password">管理者パスワード</label>
@@ -268,6 +268,7 @@
           <button class="tab active" type="button" data-admin-tab="news">ニュース</button>
           <button class="tab" type="button" data-admin-tab="history">沿革</button>
           <button class="tab" type="button" data-admin-tab="products">Security & Products</button>
+          <button class="tab" type="button" data-admin-tab="logos">ロゴ電光板</button>
         </div>
 
         <div class="frame-shell">
@@ -283,7 +284,8 @@
     const pages = {
       news: "news/",
       history: "history/",
-      products: "products/"
+      products: "products/",
+      logos: "logos/"
     };
 
     const loginPanel = document.getElementById("loginPanel");

@@ -1,6 +1,7 @@
 const ARTICLES_KEY = "articles";
 const HISTORY_KEY = "history";
 const PRODUCTS_KEY = "products";
+const LOGOS_KEY = "logos";
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
 
 const DEFAULT_ARTICLES = [
@@ -171,6 +172,38 @@ const DEFAULT_PRODUCTS = [
   }
 ];
 
+const DEFAULT_LOGOS = [
+  ["KDDI", "assets/logos/KDDI.png", 180],
+  ["NEXON", "assets/logos/넥슨.webp", 130],
+  ["BAROQUE", "assets/logos/바로크.png", 130],
+  ["Hyundai Marine & Fire Insurance", "assets/logos/현대해상보험.png", 180],
+  ["KOCCA", "assets/logos/kocca.png", 170],
+  ["Hyundai", "assets/logos/현대.png", 150],
+  ["SoftBank", "assets/logos/소프트뱅크.png", 180],
+  ["Samsung", "assets/logos/삼성.png", 150],
+  ["KT", "assets/logos/KT.png", 120],
+  ["Samsung Electro-Mechanics", "assets/logos/삼성전기.png", 180],
+  ["Samsung SDS", "assets/logos/삼성 SDS.webp", 170],
+  ["Korean Cultural Center", "assets/logos/문화원.webp", 170],
+  ["Penta Security", "assets/logos/펜타시큐리티.png", 170],
+  ["Pinkfong Japan", "assets/logos/핑크퐁 재팬.png", 120],
+  ["Netmarble Japan", "assets/logos/넷마블 재팬.png", 120],
+  ["ADK", "assets/logos/ADK.png", 130],
+  ["Quad Miners", "assets/logos/쿼드마이너.png", 160],
+  ["Hakuhodo", "assets/logos/하쿠호도.png", 180],
+  ["Marvelous", "assets/logos/마블러스.png", 160],
+  ["NAVER Cloud", "assets/logos/네이버 클라우드3.png", 180],
+  ["GS Neotek", "assets/logos/GS 네오텍.png", 160]
+].map(([title, src, width], index) => ({
+  id: `logo-${index + 1}`,
+  title,
+  src,
+  width,
+  scale: 1,
+  x: 0,
+  y: 0
+}));
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
@@ -196,6 +229,10 @@ export default {
 
       if (request.method === "GET" && path === "/products") {
         return json({ products: await getProducts(env) });
+      }
+
+      if (request.method === "GET" && path === "/logos") {
+        return json({ logos: await getLogos(env) });
       }
 
       if (request.method === "POST" && path === "/login") {
@@ -315,6 +352,42 @@ export default {
         }
       }
 
+      if (path === "/logos" && request.method === "PUT") {
+        await requireAdmin(request, env);
+        const body = await request.json();
+        const logos = validateLogos(body.logos);
+        await env.NEWS_KV.put(LOGOS_KEY, JSON.stringify(logos));
+        return json({ logos });
+      }
+
+      if (path === "/logos" && request.method === "POST") {
+        await requireAdmin(request, env);
+        const logo = validateLogo(await request.json());
+        const logos = await getLogos(env);
+        const next = [...logos, { ...logo, id: logo.id || crypto.randomUUID() }];
+        await env.NEWS_KV.put(LOGOS_KEY, JSON.stringify(next));
+        return json({ logos: next });
+      }
+
+      if (path.startsWith("/logos/")) {
+        await requireAdmin(request, env);
+        const id = decodeURIComponent(path.split("/").pop());
+        const logos = await getLogos(env);
+
+        if (request.method === "PUT") {
+          const updated = validateLogo({ ...(await request.json()), id });
+          const next = logos.map((item) => item.id === id ? updated : item);
+          await env.NEWS_KV.put(LOGOS_KEY, JSON.stringify(next));
+          return json({ logos: next });
+        }
+
+        if (request.method === "DELETE") {
+          const next = logos.filter((item) => item.id !== id);
+          await env.NEWS_KV.put(LOGOS_KEY, JSON.stringify(next));
+          return json({ logos: next });
+        }
+      }
+
       return json({ error: "Not found" }, 404);
     } catch (error) {
       const status = error.status || 500;
@@ -337,6 +410,11 @@ async function getHistory(env) {
 async function getProducts(env) {
   const stored = await env.NEWS_KV.get(PRODUCTS_KEY, "json");
   return Array.isArray(stored) ? stored : DEFAULT_PRODUCTS;
+}
+
+async function getLogos(env) {
+  const stored = await env.NEWS_KV.get(LOGOS_KEY, "json");
+  return Array.isArray(stored) ? stored : DEFAULT_LOGOS;
 }
 
 function validateArticles(value) {
@@ -448,6 +526,41 @@ function validateProduct(value) {
     }
   }
   return product;
+}
+
+function validateLogos(value) {
+  if (!Array.isArray(value)) throw httpError("logos must be an array", 400);
+  return value.map(validateLogo);
+}
+
+function validateLogo(value) {
+  const logo = {
+    id: String(value.id || crypto.randomUUID()),
+    title: String(value.title || "").trim(),
+    src: String(value.src || "").trim(),
+    width: clampNumber(value.width, 80, 260, 160),
+    scale: clampNumber(value.scale, 0.5, 4, 1),
+    x: clampNumber(value.x, -100, 100, 0),
+    y: clampNumber(value.y, -100, 100, 0)
+  };
+
+  if (!logo.title || !logo.src) throw httpError("title and image are required", 400);
+  if (!isValidLogoSource(logo.src)) throw httpError("invalid logo image", 400);
+  if (logo.src.startsWith("data:") && logo.src.length > 900000) {
+    throw httpError("logo image is too large", 400);
+  }
+  return logo;
+}
+
+function isValidLogoSource(src) {
+  if (/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/i.test(src)) return true;
+  return /^assets\/logos\/[^?#]+\.(png|webp|jpe?g|gif|svg)$/i.test(src);
+}
+
+function clampNumber(value, min, max, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, number));
 }
 
 function sortHistory(history) {

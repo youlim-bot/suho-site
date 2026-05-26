@@ -419,13 +419,25 @@
       flex: 0 0 auto;
     }
 
-    .client-logo-set img {
+    .client-logo-frame {
+      width: 160px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .client-logo-frame img {
       height: 44px;
       width: auto;
       max-width: 180px;
       object-fit: contain;
       flex: 0 0 auto;
       opacity: 1;
+      transform-origin: center;
+      will-change: transform;
     }
 
     @keyframes logoMarquee {
@@ -1245,7 +1257,12 @@
         padding-right: 34px;
       }
 
-      .client-logo-set img {
+      .client-logo-frame {
+        height: 36px;
+        max-width: 140px;
+      }
+
+      .client-logo-frame img {
         height: 36px;
         max-width: 140px;
       }
@@ -1323,52 +1340,8 @@
           </div>
           <div class="client-logo-marquee reveal" aria-label="Client and partner logos">
             <div class="client-logo-track">
-              <div class="client-logo-set">
-                <img src="assets/logos/KDDI.png" alt="KDDI" />
-                <img src="assets/logos/넥슨.webp" alt="NEXON" />
-                <img src="assets/logos/바로크.png" alt="BAROQUE" />
-                <img src="assets/logos/현대해상보험.png" alt="Hyundai Marine & Fire Insurance" />
-                <img src="assets/logos/kocca.png" alt="KOCCA" />
-                <img src="assets/logos/현대.png" alt="Hyundai" />
-                <img src="assets/logos/소프트뱅크.png" alt="SoftBank" />
-                <img src="assets/logos/삼성.png" alt="Samsung" />
-                <img src="assets/logos/KT.png" alt="KT" />
-                <img src="assets/logos/삼성전기.png" alt="Samsung Electro-Mechanics" />
-                <img src="assets/logos/삼성 SDS.webp" alt="Samsung SDS" />
-                <img src="assets/logos/문화원.webp" alt="Korean Cultural Center" />
-                <img src="assets/logos/펜타시큐리티.png" alt="Penta Security" />
-                <img src="assets/logos/핑크퐁 재팬.png" alt="Pinkfong Japan" />
-                <img src="assets/logos/넷마블 재팬.png" alt="Netmarble Japan" />
-                <img src="assets/logos/ADK.png" alt="ADK" />
-                <img src="assets/logos/쿼드마이너.png" alt="Quad Miners" />
-                <img src="assets/logos/하쿠호도.png" alt="Hakuhodo" />
-                <img src="assets/logos/마블러스.png" alt="Marvelous" />
-                <img src="assets/logos/네이버 클라우드3.png" alt="NAVER Cloud" />
-                <img src="assets/logos/GS 네오텍.png" alt="GS Neotek" />
-              </div>
-              <div class="client-logo-set" aria-hidden="true">
-                <img src="assets/logos/KDDI.png" alt="" />
-                <img src="assets/logos/넥슨.webp" alt="" />
-                <img src="assets/logos/바로크.png" alt="" />
-                <img src="assets/logos/현대해상보험.png" alt="" />
-                <img src="assets/logos/kocca.png" alt="" />
-                <img src="assets/logos/현대.png" alt="" />
-                <img src="assets/logos/소프트뱅크.png" alt="" />
-                <img src="assets/logos/삼성.png" alt="" />
-                <img src="assets/logos/KT.png" alt="" />
-                <img src="assets/logos/삼성전기.png" alt="" />
-                <img src="assets/logos/삼성 SDS.webp" alt="" />
-                <img src="assets/logos/문화원.webp" alt="" />
-                <img src="assets/logos/펜타시큐리티.png" alt="" />
-                <img src="assets/logos/핑크퐁 재팬.png" alt="" />
-                <img src="assets/logos/넷마블 재팬.png" alt="" />
-                <img src="assets/logos/ADK.png" alt="" />
-                <img src="assets/logos/쿼드마이너.png" alt="" />
-                <img src="assets/logos/하쿠호도.png" alt="" />
-                <img src="assets/logos/마블러스.png" alt="" />
-                <img src="assets/logos/네이버 클라우드3.png" alt="" />
-                <img src="assets/logos/GS 네오텍.png" alt="" />
-              </div>
+              <div class="client-logo-set" id="clientLogoSet"></div>
+              <div class="client-logo-set" id="clientLogoSetClone" aria-hidden="true"></div>
             </div>
           </div>
         </div>
@@ -1644,6 +1617,37 @@
     const menuBtn = document.getElementById("menuBtn");
     const contactForm = document.getElementById("contactForm");
     const NEWS_API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const defaultClientLogos = [
+      ["KDDI", "assets/logos/KDDI.png", 180],
+      ["NEXON", "assets/logos/넥슨.webp", 130],
+      ["BAROQUE", "assets/logos/바로크.png", 130],
+      ["Hyundai Marine & Fire Insurance", "assets/logos/현대해상보험.png", 180],
+      ["KOCCA", "assets/logos/kocca.png", 170],
+      ["Hyundai", "assets/logos/현대.png", 150],
+      ["SoftBank", "assets/logos/소프트뱅크.png", 180],
+      ["Samsung", "assets/logos/삼성.png", 150],
+      ["KT", "assets/logos/KT.png", 120],
+      ["Samsung Electro-Mechanics", "assets/logos/삼성전기.png", 180],
+      ["Samsung SDS", "assets/logos/삼성 SDS.webp", 170],
+      ["Korean Cultural Center", "assets/logos/문화원.webp", 170],
+      ["Penta Security", "assets/logos/펜타시큐리티.png", 170],
+      ["Pinkfong Japan", "assets/logos/핑크퐁 재팬.png", 120],
+      ["Netmarble Japan", "assets/logos/넷마블 재팬.png", 120],
+      ["ADK", "assets/logos/ADK.png", 130],
+      ["Quad Miners", "assets/logos/쿼드마이너.png", 160],
+      ["Hakuhodo", "assets/logos/하쿠호도.png", 180],
+      ["Marvelous", "assets/logos/마블러스.png", 160],
+      ["NAVER Cloud", "assets/logos/네이버 클라우드3.png", 180],
+      ["GS Neotek", "assets/logos/GS 네오텍.png", 160]
+    ].map(([title, src, width], index) => ({
+      id: `logo-${index + 1}`,
+      title,
+      src,
+      width,
+      scale: 1,
+      x: 0,
+      y: 0
+    }));
     const defaultProducts = [
       {
         id: "suho-data-platform",
@@ -1816,6 +1820,7 @@
     }
 
     initStarlight();
+    loadClientLogos();
 
     menuBtn.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
@@ -1849,6 +1854,37 @@
     });
 
     loadProducts();
+
+    async function loadClientLogos() {
+      try {
+        const response = await fetch(`${NEWS_API_URL}/logos`);
+        const data = await response.json();
+        renderClientLogos(Array.isArray(data.logos) && data.logos.length ? data.logos : defaultClientLogos);
+      } catch (error) {
+        renderClientLogos(defaultClientLogos);
+      }
+    }
+
+    function renderClientLogos(logos) {
+      const set = document.getElementById("clientLogoSet");
+      const clone = document.getElementById("clientLogoSetClone");
+      if (!set || !clone) return;
+      const html = logos.map(renderClientLogo).join("");
+      set.innerHTML = html;
+      clone.innerHTML = html;
+    }
+
+    function renderClientLogo(logo) {
+      const width = clamp(Number(logo.width) || 160, 80, 260);
+      const scale = clamp(Number(logo.scale) || 1, 0.5, 4);
+      const x = clamp(Number(logo.x) || 0, -100, 100);
+      const y = clamp(Number(logo.y) || 0, -100, 100);
+      return `
+        <span class="client-logo-frame" style="width:${width}px">
+          <img src="${escapeAttribute(logo.src)}" alt="${escapeAttribute(logo.title)}" style="transform: translate(${x}px, ${y}px) scale(${scale})" />
+        </span>
+      `;
+    }
 
     async function loadProducts() {
       try {
@@ -1930,6 +1966,10 @@
 
     function escapeAttribute(value) {
       return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
     }
   </script>
 </body>
