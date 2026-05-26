@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>製品・サービス管理 | SUHO Japan</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root {
+      --void: #05070a;
+      --ink: #e8edf0;
+      --muted: #aeb9bf;
+      --faint: #75858e;
+      --cyan: #00d2ff;
+      --purple: #9127ff;
+      --green: #4ade80;
+      --danger: #ff6b6b;
+      --panel: rgba(15, 23, 42, 0.72);
+      --line: rgba(133, 147, 153, 0.24);
+      --radius: 8px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 210, 255, 0.13), transparent 24rem),
+        radial-gradient(circle at 84% 22%, rgba(145, 39, 255, 0.12), transparent 28rem),
+        var(--void);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    .container { width: min(100% - 40px, 1180px); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(5,7,10,.82);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: inline-flex; align-items: center; width: 150px; min-height: 44px; }
+    .brand-logo { width: 150px; height: 44px; object-fit: contain; }
+    .admin-badge {
+      padding: 6px 10px;
+      border: 1px solid rgba(0,210,255,.24);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0,210,255,.08);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    main { padding: 54px 0 90px; }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 38px;
+      line-height: 1.2;
+    }
+    .lead { margin: 0 0 30px; color: var(--muted); }
+    .panel {
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+    .login {
+      max-width: 520px;
+      margin: 58px auto 0;
+      padding: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .form {
+      padding: 24px;
+      position: sticky;
+      top: 94px;
+    }
+    .list { padding: 18px; }
+    label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    input, select, textarea {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(133,147,153,.25);
+      border-radius: var(--radius);
+      outline: none;
+      background: rgba(5,7,10,.46);
+      color: var(--ink);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    textarea { min-height: 132px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,210,255,.14);
+    }
+    .field { margin-bottom: 16px; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .image-uploader {
+      display: grid;
+      gap: 10px;
+    }
+    .image-preview {
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px dashed rgba(0,210,255,.28);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 24% 24%, rgba(0,210,255,.12), transparent 11rem),
+        radial-gradient(circle at 82% 82%, rgba(145,39,255,.10), transparent 11rem),
+        rgba(5,7,10,.34);
+      color: var(--faint);
+      font-size: 13px;
+      font-weight: 850;
+      text-align: center;
+    }
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      display: block;
+    }
+    .image-help {
+      margin: 0;
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 8px 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .check input { width: 18px; min-height: 18px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .btn-primary { background: var(--cyan); color: #001e27; }
+    .btn-ghost { border-color: rgba(0,210,255,.34); color: var(--cyan); background: rgba(0,210,255,.04); }
+    .btn-danger { border-color: rgba(255,107,107,.38); color: var(--danger); background: rgba(255,107,107,.06); }
+    .message { min-height: 22px; margin-top: 14px; color: var(--muted); font-size: 13px; }
+    .message.ok { color: var(--green); }
+    .message.error { color: var(--danger); }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 6px 6px 18px;
+    }
+    .toolbar h2 { margin: 0; font-size: 20px; }
+    .news-item {
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      background: rgba(5,7,10,.34);
+    }
+    .news-item + .news-item { margin-top: 12px; }
+    .news-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .news-title { font-weight: 900; line-height: 1.45; }
+    .news-meta { color: var(--faint); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .news-excerpt { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    .news-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .list-thumb {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: rgba(0,210,255,.08);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+    .list-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border: 1px solid rgba(0,210,255,.24);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(0,210,255,.08);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .form { position: static; }
+    }
+    @media (max-width: 580px) {
+      .container { width: min(100% - 28px, 1180px); }
+      .row { grid-template-columns: 1fr; }
+      .topbar-inner { height: 66px; }
+      h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="../../index.html#top"><img class="brand-logo" src="../../assets/suho-logo-white.png" alt="SUHO Japan" /></a>
+      <span class="admin-badge">Products Admin</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section id="loginPanel" class="panel login">
+        <h1>製品・サービス管理</h1>
+        <p class="lead">管理者パスワードでログインしてください。</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="password">管理者パスワード</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button class="btn btn-primary" type="submit">ログイン</button>
+          <div id="loginMessage" class="message"></div>
+        </form>
+      </section>
+
+      <section id="adminPanel" class="hidden">
+        <h1>製品・サービス管理</h1>
+        <p class="lead">Security & Productsのカードを登録、編集、削除できます。保存後すぐにトップページへ反映されます。</p>
+        <div class="grid">
+          <form id="productForm" class="panel form">
+            <input id="productId" type="hidden" />
+            <div class="field">
+              <label for="title">タイトル</label>
+              <input id="title" required />
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="category">区分</label>
+                <select id="category">
+                  <option value="platform">プラットフォーム</option>
+                  <option value="industry">業界別ソリューション</option>
+                  <option value="partner">パートナー製品</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="genre">ジャンル</label>
+                <input id="genre" placeholder="例: ゼロトラスト / MSP / WAF" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="imageFile">ロゴ画像</label>
+              <div class="image-uploader">
+                <div class="image-preview" id="imagePreview">ロゴ画像を選択してください</div>
+                <input id="imageFile" type="file" accept="image/*" />
+                <input id="logoData" type="hidden" />
+                <p class="image-help">選択したロゴは自動でリサイズされ、カード内で比率を保って表示されます。</p>
+                <button class="btn btn-ghost" type="button" id="removeImageButton">ロゴを削除</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="description">簡単説明</label>
+              <textarea id="description" required></textarea>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="linkType">リンク種別</label>
+                <select id="linkType">
+                  <option value="internal">内部ページ（同じタブ）</option>
+                  <option value="external">外部/パートナー（新しいタブ）</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="link">リンク URL</label>
+                <input id="link" placeholder="#contact / products/example/ / https://example.com" />
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" type="submit">保存する</button>
+              <button class="btn btn-ghost" type="button" id="newButton">新規作成</button>
+              <button class="btn btn-ghost" type="button" id="logoutButton">ログアウト</button>
+            </div>
+            <div id="formMessage" class="message"></div>
+          </form>
+
+          <div class="panel list">
+            <div class="toolbar">
+              <h2>カード一覧</h2>
+              <button class="btn btn-ghost" type="button" id="refreshButton">再読み込み</button>
+            </div>
+            <div id="productList"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const tokenKey = "suho_news_admin_token";
+    let products = [];
+
+    const loginPanel = document.getElementById("loginPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginForm = document.getElementById("loginForm");
+    const loginMessage = document.getElementById("loginMessage");
+    const productForm = document.getElementById("productForm");
+    const formMessage = document.getElementById("formMessage");
+    const productList = document.getElementById("productList");
+    const imageFile = document.getElementById("imageFile");
+    const logoData = document.getElementById("logoData");
+    const imagePreview = document.getElementById("imagePreview");
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage(loginMessage, "ログイン中...");
+      try {
+        const result = await api("/login", {
+          method: "POST",
+          body: JSON.stringify({ password: document.getElementById("password").value })
+        }, false);
+        sessionStorage.setItem(tokenKey, result.token);
+        setMessage(loginMessage, "ログインしました。", "ok");
+        await showAdmin();
+      } catch (error) {
+        setMessage(loginMessage, "ログインに失敗しました。", "error");
+      }
+    });
+
+    productForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const product = readForm();
+      try {
+        const id = document.getElementById("productId").value;
+        const result = await api(id ? `/products/${encodeURIComponent(id)}` : "/products", {
+          method: id ? "PUT" : "POST",
+          body: JSON.stringify(product)
+        });
+        products = result.products;
+        clearForm();
+        renderList();
+        setMessage(formMessage, "保存しました。", "ok");
+      } catch (error) {
+        setMessage(formMessage, error.message || "保存に失敗しました。", "error");
+      }
+    });
+
+    document.getElementById("newButton").addEventListener("click", clearForm);
+    document.getElementById("refreshButton").addEventListener("click", loadProducts);
+    document.getElementById("removeImageButton").addEventListener("click", () => {
+      imageFile.value = "";
+      logoData.value = "";
+      setImagePreview("");
+    });
+    imageFile.addEventListener("change", async () => {
+      const file = imageFile.files?.[0];
+      if (!file) return;
+      try {
+        setMessage(formMessage, "ロゴを処理中です...");
+        const resized = await resizeImage(file);
+        logoData.value = resized;
+        setImagePreview(resized);
+        setMessage(formMessage, "ロゴを設定しました。", "ok");
+      } catch (error) {
+        imageFile.value = "";
+        setMessage(formMessage, error.message || "ロゴの読み込みに失敗しました。", "error");
+      }
+    });
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      sessionStorage.removeItem(tokenKey);
+      adminPanel.classList.add("hidden");
+      loginPanel.classList.remove("hidden");
+    });
+
+    async function showAdmin() {
+      loginPanel.classList.add("hidden");
+      adminPanel.classList.remove("hidden");
+      await loadProducts();
+    }
+
+    async function loadProducts() {
+      const result = await api("/products", {}, false);
+      products = result.products || [];
+      renderList();
+    }
+
+    function renderList() {
+      productList.innerHTML = products.map((product) => `
+        <article class="news-item">
+          <div class="news-head">
+            <div>
+              <div class="news-title">${listMedia(product)} <span>${escapeHtml(product.title)}</span></div>
+              <span class="pill">${categoryLabel(product.category)} / ${escapeHtml(product.genre)}</span>
+            </div>
+            <div class="news-meta">${product.linkType === "external" ? "新しいタブ" : "同じタブ"}</div>
+          </div>
+          <div class="news-excerpt">${escapeHtml(product.description)}</div>
+          <div class="actions">
+            <button class="btn btn-ghost" type="button" data-edit="${product.id}">編集</button>
+            <button class="btn btn-danger" type="button" data-delete="${product.id}">削除</button>
+          </div>
+        </article>
+      `).join("");
+
+      productList.querySelectorAll("[data-edit]").forEach((button) => {
+        button.addEventListener("click", () => editProduct(button.dataset.edit));
+      });
+      productList.querySelectorAll("[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => deleteProduct(button.dataset.delete));
+      });
+    }
+
+    function editProduct(id) {
+      const product = products.find((item) => item.id === id);
+      if (!product) return;
+      document.getElementById("productId").value = product.id;
+      document.getElementById("title").value = product.title;
+      document.getElementById("category").value = product.category;
+      document.getElementById("genre").value = product.genre;
+      imageFile.value = "";
+      logoData.value = product.logo || "";
+      setImagePreview(product.logo || "");
+      document.getElementById("description").value = product.description;
+      document.getElementById("linkType").value = product.linkType || "internal";
+      document.getElementById("link").value = product.link || "";
+      setMessage(formMessage, "編集中です。", "ok");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("このカードを削除しますか？")) return;
+      const result = await api(`/products/${encodeURIComponent(id)}`, { method: "DELETE" });
+      products = result.products;
+      renderList();
+      setMessage(formMessage, "削除しました。", "ok");
+    }
+
+    function readForm() {
+      return {
+        id: document.getElementById("productId").value,
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        genre: document.getElementById("genre").value,
+        logo: logoData.value,
+        description: document.getElementById("description").value,
+        linkType: document.getElementById("linkType").value,
+        link: document.getElementById("link").value.trim()
+      };
+    }
+
+    function clearForm() {
+      productForm.reset();
+      document.getElementById("productId").value = "";
+      imageFile.value = "";
+      logoData.value = "";
+      setImagePreview("");
+      setMessage(formMessage, "");
+    }
+
+    function setImagePreview(src) {
+      imagePreview.innerHTML = src
+        ? `<img src="${escapeAttribute(src)}" alt="ロゴ画像プレビュー" />`
+        : "ロゴ画像を選択してください";
+    }
+
+    function listMedia(product) {
+      if (product.logo) {
+        return `<span class="list-thumb"><img src="${escapeAttribute(product.logo)}" alt="" /></span>`;
+      }
+      return `<span class="list-thumb">${escapeHtml(String(product.title || "S").trim().charAt(0).toUpperCase())}</span>`;
+    }
+
+    function resizeImage(file) {
+      if (!file.type.startsWith("image/")) {
+        return Promise.reject(new Error("画像ファイルを選択してください。"));
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        return Promise.reject(new Error("画像は8MB以下にしてください。"));
+      }
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("画像を読み込めませんでした。"));
+        reader.onload = () => {
+          const image = new Image();
+          image.onerror = () => reject(new Error("画像を読み込めませんでした。"));
+          image.onload = () => {
+            const maxSize = 420;
+            const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+            const width = Math.max(1, Math.round(image.width * scale));
+            const height = Math.max(1, Math.round(image.height * scale));
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext("2d");
+            context.drawImage(image, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/png"));
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function api(path, options = {}, authorized = true) {
+      const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+      if (authorized) headers.Authorization = `Bearer ${sessionStorage.getItem(tokenKey) || ""}`;
+      const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || "Request failed");
+      return body;
+    }
+
+    function setMessage(element, text, type = "") {
+      element.textContent = text;
+      element.className = `message ${type}`.trim();
+    }
+
+    function categoryLabel(category) {
+      return {
+        platform: "プラットフォーム",
+        industry: "業界別ソリューション",
+        partner: "パートナー製品"
+      }[category] || category;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    if (sessionStorage.getItem(tokenKey)) showAdmin();
+  </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 const ARTICLES_KEY = "articles";
 const HISTORY_KEY = "history";
+const PRODUCTS_KEY = "products";
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
 
 const DEFAULT_ARTICLES = [
@@ -77,6 +78,99 @@ const DEFAULT_ARTICLES = [
   }
 ];
 
+const DEFAULT_PRODUCTS = [
+  {
+    id: "suho-data-platform",
+    title: "SUHO DataPlatform",
+    description: "企業データを一元管理するクラウドネイティブなデータプラットフォーム。リアルタイム分析からMLまで対応します。",
+    category: "platform",
+    genre: "データ基盤",
+    logo: "",
+    link: "#contact",
+    linkType: "internal"
+  },
+  {
+    id: "suho-secure-edge",
+    title: "SUHO SecureEdge",
+    description: "ゼロトラストセキュリティモデルに基づいた包括的なセキュリティプラットフォーム。クラウド・オンプレ両対応です。",
+    category: "platform",
+    genre: "ゼロトラスト",
+    logo: "",
+    link: "#contact",
+    linkType: "internal"
+  },
+  {
+    id: "suho-ai-studio",
+    title: "SUHO AI Studio",
+    description: "ノーコード/ローコードでAIモデルを開発・デプロイできるMLOpsプラットフォーム。専門知識不要で始められます。",
+    category: "platform",
+    genre: "MLOps",
+    logo: "",
+    link: "#contact",
+    linkType: "internal"
+  },
+  {
+    id: "healthcare-solution",
+    title: "医療・ヘルスケア",
+    description: "電子カルテ連携AIから医療画像診断支援まで、医療DXを包括的にサポートします。",
+    category: "industry",
+    genre: "医療DX",
+    logo: "",
+    link: "#contact",
+    linkType: "internal"
+  },
+  {
+    id: "manufacturing-solution",
+    title: "製造業",
+    description: "スマートファクトリー実現に向けたIoT基盤とAIによる品質管理・予知保全ソリューション。",
+    category: "industry",
+    genre: "スマートファクトリー",
+    logo: "",
+    link: "#contact",
+    linkType: "internal"
+  },
+  {
+    id: "fintech-solution",
+    title: "金融・フィンテック",
+    description: "不正検知AIからリスク分析まで、金融規制に準拠したセキュアなクラウドソリューションを提供します。",
+    category: "industry",
+    genre: "フィンテック",
+    logo: "",
+    link: "#contact",
+    linkType: "internal"
+  },
+  {
+    id: "microsoft-partner",
+    title: "Microsoft",
+    description: "クラウド、ライセンス、業務基盤の導入から運用まで支援します。",
+    category: "partner",
+    genre: "Gold Partner",
+    logo: "",
+    link: "https://www.microsoft.com/",
+    linkType: "external"
+  },
+  {
+    id: "aws-partner",
+    title: "AWS",
+    description: "クラウドインフラの設計、移行、運用最適化を支援します。",
+    category: "partner",
+    genre: "Advanced Tier",
+    logo: "",
+    link: "https://aws.amazon.com/",
+    linkType: "external"
+  },
+  {
+    id: "datadog-partner",
+    title: "Datadog",
+    description: "監視、可観測性、インシデント対応の運用品質向上を支えます。",
+    category: "partner",
+    genre: "Technology Partner",
+    logo: "",
+    link: "https://www.datadoghq.com/",
+    linkType: "external"
+  }
+];
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
@@ -98,6 +192,10 @@ export default {
 
       if (request.method === "GET" && path === "/history") {
         return json({ history: await getHistory(env) });
+      }
+
+      if (request.method === "GET" && path === "/products") {
+        return json({ products: await getProducts(env) });
       }
 
       if (request.method === "POST" && path === "/login") {
@@ -181,6 +279,42 @@ export default {
         }
       }
 
+      if (path === "/products" && request.method === "PUT") {
+        await requireAdmin(request, env);
+        const body = await request.json();
+        const products = validateProducts(body.products);
+        await env.NEWS_KV.put(PRODUCTS_KEY, JSON.stringify(products));
+        return json({ products });
+      }
+
+      if (path === "/products" && request.method === "POST") {
+        await requireAdmin(request, env);
+        const product = validateProduct(await request.json());
+        const products = await getProducts(env);
+        const next = [{ ...product, id: product.id || crypto.randomUUID() }, ...products];
+        await env.NEWS_KV.put(PRODUCTS_KEY, JSON.stringify(next));
+        return json({ products: next });
+      }
+
+      if (path.startsWith("/products/")) {
+        await requireAdmin(request, env);
+        const id = decodeURIComponent(path.split("/").pop());
+        const products = await getProducts(env);
+
+        if (request.method === "PUT") {
+          const updated = validateProduct({ ...(await request.json()), id });
+          const next = products.map((item) => item.id === id ? updated : item);
+          await env.NEWS_KV.put(PRODUCTS_KEY, JSON.stringify(next));
+          return json({ products: next });
+        }
+
+        if (request.method === "DELETE") {
+          const next = products.filter((item) => item.id !== id);
+          await env.NEWS_KV.put(PRODUCTS_KEY, JSON.stringify(next));
+          return json({ products: next });
+        }
+      }
+
       return json({ error: "Not found" }, 404);
     } catch (error) {
       const status = error.status || 500;
@@ -198,6 +332,11 @@ async function getArticles(env) {
 async function getHistory(env) {
   const stored = await env.NEWS_KV.get(HISTORY_KEY, "json");
   return sortHistory(Array.isArray(stored) ? stored : []);
+}
+
+async function getProducts(env) {
+  const stored = await env.NEWS_KV.get(PRODUCTS_KEY, "json");
+  return Array.isArray(stored) ? stored : DEFAULT_PRODUCTS;
 }
 
 function validateArticles(value) {
@@ -260,6 +399,55 @@ function validateHistoryItem(value) {
   if (!/^(0[1-9]|1[0-2])$/.test(item.month)) throw httpError("invalid month", 400);
   if (!item.content) throw httpError("content is required", 400);
   return item;
+}
+
+function validateProducts(value) {
+  if (!Array.isArray(value)) throw httpError("products must be an array", 400);
+  return value.map(validateProduct);
+}
+
+function validateProduct(value) {
+  const product = {
+    id: String(value.id || crypto.randomUUID()),
+    title: String(value.title || "").trim(),
+    description: String(value.description || "").trim(),
+    category: String(value.category || "platform").trim(),
+    genre: String(value.genre || "").trim(),
+    logo: String(value.logo || "").trim(),
+    link: String(value.link || "").trim(),
+    linkType: String(value.linkType || "internal").trim()
+  };
+
+  if (!product.title || !product.description || !product.genre) {
+    throw httpError("title, description, and genre are required", 400);
+  }
+  if (!["platform", "industry", "partner"].includes(product.category)) {
+    throw httpError("invalid category", 400);
+  }
+  if (!["internal", "external"].includes(product.linkType)) {
+    throw httpError("invalid link type", 400);
+  }
+  if (product.link) {
+    if (product.linkType === "external") {
+      try {
+        const url = new URL(product.link);
+        if (!["http:", "https:"].includes(url.protocol)) throw new Error("invalid protocol");
+      } catch {
+        throw httpError("invalid link", 400);
+      }
+    } else if (!/^(#|\/|\.{1,2}\/|[a-z0-9_-]+\/)/i.test(product.link)) {
+      throw httpError("invalid internal link", 400);
+    }
+  }
+  if (product.logo) {
+    if (!/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/i.test(product.logo)) {
+      throw httpError("invalid logo", 400);
+    }
+    if (product.logo.length > 900000) {
+      throw httpError("logo is too large", 400);
+    }
+  }
+  return product;
 }
 
 function sortHistory(history) {

@@ -730,6 +730,53 @@
       min-height: 150px;
     }
 
+    .product-card-link {
+      display: flex;
+      min-height: 220px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .product-card-link .card {
+      width: 100%;
+      transition: border-color 180ms ease, transform 180ms ease;
+    }
+
+    .product-card-link:hover .card,
+    .product-card-link:focus-visible .card {
+      border-color: rgba(0, 210, 255, 0.42);
+      transform: translateY(-2px);
+    }
+
+    .product-card-link:focus-visible {
+      outline: 2px solid rgba(0, 210, 255, 0.72);
+      outline-offset: 4px;
+      border-radius: var(--radius);
+    }
+
+    .product-logo {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 210, 255, 0.24);
+      border-radius: var(--radius);
+      background: rgba(0, 210, 255, 0.09);
+      color: var(--cyan);
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .product-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 8px;
+      display: block;
+    }
+
     .partner-card .badge {
       position: static;
       display: inline-flex;
@@ -1302,62 +1349,9 @@
               <button class="product-tab" type="button" role="tab" aria-selected="false" data-product-tab="partner">パートナー製品</button>
             </div>
 
-            <div class="product-tab-panel active" data-product-panel="platform">
-              <div class="product-grid">
-                <article class="card">
-                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-                  <h3>SUHO DataPlatform</h3>
-                  <p>企業データを一元管理するクラウドネイティブなデータプラットフォーム。リアルタイム分析からMLまで対応します。</p>
-                  <div class="chips"><span class="chip">データ基盤</span><span class="chip">リアルタイム分析</span><span class="chip">ML Pipeline</span></div>
-                </article>
-                <article class="card">
-                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.5 3 7.7 7 9 4-1.3 7-4.5 7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-                  <h3>SUHO SecureEdge</h3>
-                  <p>ゼロトラストセキュリティモデルに基づいた包括的なセキュリティプラットフォーム。クラウド・オンプレ両対応です。</p>
-                  <div class="chips"><span class="chip">ゼロトラスト</span><span class="chip">SIEM</span><span class="chip">SOC連携</span></div>
-                </article>
-                <article class="card">
-                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h8v8H8zM12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2m0-14-2 2M7 17l-2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                  <h3>SUHO AI Studio</h3>
-                  <p>ノーコード/ローコードでAIモデルを開発・デプロイできるMLOpsプラットフォーム。専門知識不要で始められます。</p>
-                  <div class="chips"><span class="chip">MLOps</span><span class="chip">ノーコードAI</span><span class="chip">自動学習</span></div>
-                </article>
-              </div>
-            </div>
-
-            <div class="product-tab-panel" data-product-panel="industry">
-              <div class="product-grid">
-                <article class="card">
-                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21V8a5 5 0 0 1 10 0v13M5 21h14M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                  <h3>医療・ヘルスケア</h3>
-                  <p>電子カルテ連携AIから医療画像診断支援まで、医療DXを包括的にサポートします。</p>
-                  <div class="chips"><span class="chip">電子カルテ</span><span class="chip">診断支援AI</span><span class="chip">HIPAA対応</span></div>
-                </article>
-                <article class="card">
-                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l4 3V8l4 3V5h8v15H4zm10-4h2m-7 0h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                  <h3>製造業</h3>
-                  <p>スマートファクトリー実現に向けたIoT基盤とAIによる品質管理・予知保全ソリューション。</p>
-                  <div class="chips"><span class="chip">スマートファクトリー</span><span class="chip">予知保全</span><span class="chip">IoT</span></div>
-                </article>
-                <article class="card">
-                  <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M6 7v13h12V7M9 11h6M9 15h4M8 4h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                  <h3>金融・フィンテック</h3>
-                  <p>不正検知AIからリスク分析まで、金融規制に準拠したセキュアなクラウドソリューションを提供します。</p>
-                  <div class="chips"><span class="chip">不正検知</span><span class="chip">リスク分析</span><span class="chip">FSA対応</span></div>
-                </article>
-              </div>
-            </div>
-
-            <div class="product-tab-panel" data-product-panel="partner">
-              <div class="product-grid">
-                <article class="card partner-card"><h3>Microsoft</h3><p>クラウド、ライセンス、業務基盤の導入から運用まで支援します。</p><span class="badge">Gold Partner</span></article>
-                <article class="card partner-card"><h3>AWS</h3><p>クラウドインフラの設計、移行、運用最適化を支援します。</p><span class="badge">Advanced Tier</span></article>
-                <article class="card partner-card"><h3>Google Cloud</h3><p>データ活用とクラウド基盤構築を組み合わせた導入支援を行います。</p><span class="badge">Premier Partner</span></article>
-                <article class="card partner-card"><h3>Salesforce</h3><p>顧客管理と業務プロセス改善を見据えた導入をサポートします。</p><span class="badge">Consulting Partner</span></article>
-                <article class="card partner-card"><h3>ServiceNow</h3><p>IT運用管理とサービス管理の効率化を支援します。</p><span class="badge">Technology Partner</span></article>
-                <article class="card partner-card"><h3>Datadog</h3><p>監視、可観測性、インシデント対応の運用品質向上を支えます。</p><span class="badge">Technology Partner</span></article>
-              </div>
-            </div>
+            <div class="product-tab-panel active" data-product-panel="platform"><div class="product-grid" id="platformProducts"></div></div>
+            <div class="product-tab-panel" data-product-panel="industry"><div class="product-grid" id="industryProducts"></div></div>
+            <div class="product-tab-panel" data-product-panel="partner"><div class="product-grid" id="partnerProducts"></div></div>
           </div>
         </div>
       </section>
@@ -1512,6 +1506,99 @@
     const nav = document.getElementById("nav");
     const menuBtn = document.getElementById("menuBtn");
     const contactForm = document.getElementById("contactForm");
+    const NEWS_API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
+    const defaultProducts = [
+      {
+        id: "suho-data-platform",
+        title: "SUHO DataPlatform",
+        description: "企業データを一元管理するクラウドネイティブなデータプラットフォーム。リアルタイム分析からMLまで対応します。",
+        category: "platform",
+        genre: "データ基盤",
+        logo: "",
+        link: "#contact",
+        linkType: "internal"
+      },
+      {
+        id: "suho-secure-edge",
+        title: "SUHO SecureEdge",
+        description: "ゼロトラストセキュリティモデルに基づいた包括的なセキュリティプラットフォーム。クラウド・オンプレ両対応です。",
+        category: "platform",
+        genre: "ゼロトラスト",
+        logo: "",
+        link: "#contact",
+        linkType: "internal"
+      },
+      {
+        id: "suho-ai-studio",
+        title: "SUHO AI Studio",
+        description: "ノーコード/ローコードでAIモデルを開発・デプロイできるMLOpsプラットフォーム。専門知識不要で始められます。",
+        category: "platform",
+        genre: "MLOps",
+        logo: "",
+        link: "#contact",
+        linkType: "internal"
+      },
+      {
+        id: "healthcare-solution",
+        title: "医療・ヘルスケア",
+        description: "電子カルテ連携AIから医療画像診断支援まで、医療DXを包括的にサポートします。",
+        category: "industry",
+        genre: "医療DX",
+        logo: "",
+        link: "#contact",
+        linkType: "internal"
+      },
+      {
+        id: "manufacturing-solution",
+        title: "製造業",
+        description: "スマートファクトリー実現に向けたIoT基盤とAIによる品質管理・予知保全ソリューション。",
+        category: "industry",
+        genre: "スマートファクトリー",
+        logo: "",
+        link: "#contact",
+        linkType: "internal"
+      },
+      {
+        id: "fintech-solution",
+        title: "金融・フィンテック",
+        description: "不正検知AIからリスク分析まで、金融規制に準拠したセキュアなクラウドソリューションを提供します。",
+        category: "industry",
+        genre: "フィンテック",
+        logo: "",
+        link: "#contact",
+        linkType: "internal"
+      },
+      {
+        id: "microsoft-partner",
+        title: "Microsoft",
+        description: "クラウド、ライセンス、業務基盤の導入から運用まで支援します。",
+        category: "partner",
+        genre: "Gold Partner",
+        logo: "",
+        link: "https://www.microsoft.com/",
+        linkType: "external"
+      },
+      {
+        id: "aws-partner",
+        title: "AWS",
+        description: "クラウドインフラの設計、移行、運用最適化を支援します。",
+        category: "partner",
+        genre: "Advanced Tier",
+        logo: "",
+        link: "https://aws.amazon.com/",
+        linkType: "external"
+      },
+      {
+        id: "datadog-partner",
+        title: "Datadog",
+        description: "監視、可観測性、インシデント対応の運用品質向上を支えます。",
+        category: "partner",
+        genre: "Technology Partner",
+        logo: "",
+        link: "https://www.datadoghq.com/",
+        linkType: "external"
+      }
+    ];
 
     function initStarlight() {
       const canvas = document.getElementById("starlightCanvas");
@@ -1624,6 +1711,54 @@
       });
     });
 
+    loadProducts();
+
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${NEWS_API_URL}/products`);
+        const data = await response.json();
+        renderProducts(Array.isArray(data.products) && data.products.length ? data.products : defaultProducts);
+      } catch (error) {
+        renderProducts(defaultProducts);
+      }
+    }
+
+    function renderProducts(products) {
+      const targets = {
+        platform: document.getElementById("platformProducts"),
+        industry: document.getElementById("industryProducts"),
+        partner: document.getElementById("partnerProducts")
+      };
+
+      Object.entries(targets).forEach(([category, element]) => {
+        const items = products.filter((product) => product.category === category);
+        element.innerHTML = items.length
+          ? items.map(renderProductCard).join("")
+          : `<article class="card"><p>登録された項目がありません。</p></article>`;
+      });
+    }
+
+    function renderProductCard(product) {
+      const href = product.link || "#contact";
+      const isExternal = product.linkType === "external";
+      const target = isExternal ? ` target="_blank" rel="noopener noreferrer"` : "";
+      return `
+        <a class="product-card-link" href="${escapeAttribute(href)}"${target}>
+          <article class="card ${product.category === "partner" ? "partner-card" : ""}">
+            <div class="product-logo">${renderProductLogo(product)}</div>
+            <h3>${escapeHtml(product.title)}</h3>
+            <p>${escapeHtml(product.description)}</p>
+            <div class="chips"><span class="chip">${escapeHtml(product.genre)}</span><span class="chip">${isExternal ? "外部リンク" : "内部リンク"}</span></div>
+          </article>
+        </a>
+      `;
+    }
+
+    function renderProductLogo(product) {
+      if (product.logo) return `<img src="${escapeAttribute(product.logo)}" alt="" />`;
+      return escapeHtml(String(product.title || "S").trim().charAt(0).toUpperCase());
+    }
+
     contactForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const button = contactForm.querySelector("button[type='submit']");
@@ -1645,6 +1780,20 @@
     }, { threshold: 0.14 });
 
     document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
   </script>
 </body>
 </html>
