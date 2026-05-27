@@ -135,6 +135,7 @@
     }
     .help { margin: -6px 0 16px; color: var(--faint); font-size: 12px; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .order-actions { margin-bottom: 14px; }
     .btn {
       display: inline-flex;
       align-items: center;
@@ -150,6 +151,10 @@
     .btn-primary { background: var(--cyan); color: #001e27; }
     .btn-ghost { border-color: rgba(0,210,255,.34); color: var(--cyan); background: rgba(0,210,255,.04); }
     .btn-danger { border-color: rgba(255,107,107,.38); color: var(--danger); background: rgba(255,107,107,.06); }
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: .42;
+    }
     .message { min-height: 22px; margin-top: 14px; color: var(--muted); font-size: 13px; }
     .message.ok { color: var(--green); }
     .message.error { color: var(--danger); }
@@ -376,13 +381,17 @@
     }
 
     function renderList() {
-      logoList.innerHTML = logos.map((logo) => `
+      logoList.innerHTML = logos.map((logo, index) => `
         <article class="logo-item">
           <div class="logo-head">
             <div class="logo-title">${escapeHtml(logo.title)}</div>
-            <div class="logo-meta">幅 ${escapeHtml(logo.width)} / 拡大 ${escapeHtml(logo.scale)}</div>
+            <div class="logo-meta">表示順 ${index + 1} / 幅 ${escapeHtml(logo.width)} / 拡大 ${escapeHtml(logo.scale)}</div>
           </div>
           <div class="mini-preview">${renderLogoFrame(logo)}</div>
+          <div class="actions order-actions">
+            <button class="btn btn-ghost" type="button" data-move-up="${escapeAttribute(logo.id)}"${index === 0 ? " disabled" : ""}>上へ</button>
+            <button class="btn btn-ghost" type="button" data-move-down="${escapeAttribute(logo.id)}"${index === logos.length - 1 ? " disabled" : ""}>下へ</button>
+          </div>
           <div class="actions">
             <button class="btn btn-ghost" type="button" data-edit="${escapeAttribute(logo.id)}">編集</button>
             <button class="btn btn-danger" type="button" data-delete="${escapeAttribute(logo.id)}">削除</button>
@@ -395,6 +404,12 @@
       });
       logoList.querySelectorAll("[data-delete]").forEach((button) => {
         button.addEventListener("click", () => deleteLogo(button.dataset.delete));
+      });
+      logoList.querySelectorAll("[data-move-up]").forEach((button) => {
+        button.addEventListener("click", () => moveLogo(button.dataset.moveUp, -1));
+      });
+      logoList.querySelectorAll("[data-move-down]").forEach((button) => {
+        button.addEventListener("click", () => moveLogo(button.dataset.moveDown, 1));
       });
     }
 
@@ -420,6 +435,31 @@
       logos = result.logos;
       renderList();
       setMessage(formMessage, "削除しました。", "ok");
+    }
+
+    async function moveLogo(id, direction) {
+      const index = logos.findIndex((item) => item.id === id);
+      const targetIndex = index + direction;
+      if (index < 0 || targetIndex < 0 || targetIndex >= logos.length) return;
+
+      const next = [...logos];
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      logos = next;
+      renderList();
+      setMessage(formMessage, "表示順を保存中です...");
+
+      try {
+        const result = await api("/logos", {
+          method: "PUT",
+          body: JSON.stringify({ logos })
+        });
+        logos = result.logos;
+        renderList();
+        setMessage(formMessage, "表示順を保存しました。", "ok");
+      } catch (error) {
+        await loadLogos();
+        setMessage(formMessage, error.message || "表示順の保存に失敗しました。", "error");
+      }
     }
 
     function readForm() {
