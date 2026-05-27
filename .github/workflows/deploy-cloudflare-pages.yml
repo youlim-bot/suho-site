@@ -20,6 +20,8 @@ jobs:
           cp -R recruit /tmp/suho-site-pages/recruit
           cp -R news /tmp/suho-site-pages/news
           cp -R history /tmp/suho-site-pages/history
+          cp -R privacy /tmp/suho-site-pages/privacy
+          cp -R terms /tmp/suho-site-pages/terms
           cp -R admin /tmp/suho-site-pages/admin
 
       - name: Deploy News API Worker
