@@ -1,6 +1,7 @@
 const ARTICLES_KEY = "articles";
 const HISTORY_KEY = "history";
 const PRODUCTS_KEY = "products";
+const PRODUCT_GENRES_KEY = "productGenres";
 const LOGOS_KEY = "logos";
 const SITE_TEXTS_KEY = "siteTexts";
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
@@ -173,6 +174,27 @@ const DEFAULT_PRODUCTS = [
   }
 ];
 
+const DEFAULT_PRODUCT_GENRES = [
+  "データ基盤",
+  "セキュリティ",
+  "ゼロトラスト",
+  "AI/ML",
+  "MLOps",
+  "医療DX",
+  "製造DX",
+  "スマートファクトリー",
+  "金融DX",
+  "フィンテック",
+  "MSP",
+  "WAF",
+  "CDN",
+  "監視・運用",
+  "パートナー商品",
+  "Gold Partner",
+  "Advanced Tier",
+  "Technology Partner"
+].map((name, index) => ({ id: `genre-${index + 1}`, name }));
+
 const DEFAULT_LOGOS = [
   ["KDDI", "assets/logos/KDDI.png", 180],
   ["NEXON", "assets/logos/넥슨.webp", 130],
@@ -262,6 +284,10 @@ export default {
 
       if (request.method === "GET" && path === "/products") {
         return json({ products: await getProducts(env) });
+      }
+
+      if (request.method === "GET" && path === "/product-genres") {
+        return json({ genres: await getProductGenres(env) });
       }
 
       if (request.method === "GET" && path === "/logos") {
@@ -389,6 +415,46 @@ export default {
         }
       }
 
+      if (path === "/product-genres" && request.method === "PUT") {
+        await requireAdmin(request, env);
+        const body = await request.json();
+        const genres = validateProductGenres(body.genres);
+        await env.NEWS_KV.put(PRODUCT_GENRES_KEY, JSON.stringify(genres));
+        return json({ genres });
+      }
+
+      if (path === "/product-genres" && request.method === "POST") {
+        await requireAdmin(request, env);
+        const genre = validateProductGenre(await request.json());
+        const genres = await getProductGenres(env);
+        if (genres.some((item) => item.name === genre.name)) throw httpError("genre already exists", 400);
+        const next = [...genres, { ...genre, id: genre.id || crypto.randomUUID() }];
+        await env.NEWS_KV.put(PRODUCT_GENRES_KEY, JSON.stringify(next));
+        return json({ genres: next });
+      }
+
+      if (path.startsWith("/product-genres/")) {
+        await requireAdmin(request, env);
+        const id = decodeURIComponent(path.split("/").pop());
+        const genres = await getProductGenres(env);
+
+        if (request.method === "PUT") {
+          const updated = validateProductGenre({ ...(await request.json()), id });
+          if (genres.some((item) => item.id !== id && item.name === updated.name)) {
+            throw httpError("genre already exists", 400);
+          }
+          const next = genres.map((item) => item.id === id ? updated : item);
+          await env.NEWS_KV.put(PRODUCT_GENRES_KEY, JSON.stringify(next));
+          return json({ genres: next });
+        }
+
+        if (request.method === "DELETE") {
+          const next = genres.filter((item) => item.id !== id);
+          await env.NEWS_KV.put(PRODUCT_GENRES_KEY, JSON.stringify(next));
+          return json({ genres: next });
+        }
+      }
+
       if (path === "/logos" && request.method === "PUT") {
         await requireAdmin(request, env);
         const body = await request.json();
@@ -455,6 +521,11 @@ async function getHistory(env) {
 async function getProducts(env) {
   const stored = await env.NEWS_KV.get(PRODUCTS_KEY, "json");
   return Array.isArray(stored) ? stored : DEFAULT_PRODUCTS;
+}
+
+async function getProductGenres(env) {
+  const stored = await env.NEWS_KV.get(PRODUCT_GENRES_KEY, "json");
+  return Array.isArray(stored) ? validateProductGenres(stored) : DEFAULT_PRODUCT_GENRES;
 }
 
 async function getLogos(env) {
@@ -536,6 +607,26 @@ function validateHistoryItem(value) {
 function validateProducts(value) {
   if (!Array.isArray(value)) throw httpError("products must be an array", 400);
   return value.map(validateProduct);
+}
+
+function validateProductGenres(value) {
+  if (!Array.isArray(value)) throw httpError("genres must be an array", 400);
+  const seen = new Set();
+  return value.map(validateProductGenre).filter((genre) => {
+    if (seen.has(genre.name)) return false;
+    seen.add(genre.name);
+    return true;
+  });
+}
+
+function validateProductGenre(value) {
+  const genre = {
+    id: String(value.id || crypto.randomUUID()),
+    name: String(value.name || "").trim()
+  };
+  if (!genre.name) throw httpError("genre name is required", 400);
+  if (genre.name.length > 40) throw httpError("genre name is too long", 400);
+  return genre;
 }
 
 function validateProduct(value) {

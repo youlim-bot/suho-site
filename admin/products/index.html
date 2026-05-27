@@ -117,6 +117,64 @@
       box-shadow: 0 0 0 3px rgba(0,210,255,.14);
     }
     .field { margin-bottom: 16px; }
+    .genre-panel {
+      margin-bottom: 22px;
+      padding: 20px;
+    }
+    .genre-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+    .genre-head h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+    .genre-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .genre-editor {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .genre-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .genre-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 0 8px 0 12px;
+      border: 1px solid rgba(0,210,255,.22);
+      border-radius: 999px;
+      background: rgba(0,210,255,.07);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .chip-button {
+      min-width: 28px;
+      min-height: 26px;
+      padding: 0 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      background: rgba(5,7,10,.42);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .chip-button:hover { color: var(--cyan); border-color: rgba(0,210,255,.34); }
+    .chip-button.danger:hover { color: var(--danger); border-color: rgba(255,107,107,.38); }
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -254,6 +312,7 @@
     @media (max-width: 580px) {
       .container { width: min(100% - 28px, 1180px); }
       .row { grid-template-columns: 1fr; }
+      .genre-head, .genre-editor { grid-template-columns: 1fr; flex-direction: column; }
       .topbar-inner { height: 66px; }
       h1 { font-size: 30px; }
     }
@@ -285,6 +344,21 @@
       <section id="adminPanel" class="hidden">
         <h1>製品・サービス管理</h1>
         <p class="lead">Security & Productsのカードを登録、編集、削除できます。保存後すぐにトップページへ反映されます。</p>
+        <section class="panel genre-panel">
+          <div class="genre-head">
+            <div>
+              <h2>ジャンル管理</h2>
+              <p>商品カードで選択するジャンルを追加、編集、削除できます。</p>
+            </div>
+          </div>
+          <div class="genre-editor">
+            <input id="genreName" placeholder="例：SOC / SIEM / CDN" />
+            <button class="btn btn-primary" type="button" id="saveGenreButton">追加する</button>
+            <button class="btn btn-ghost" type="button" id="cancelGenreButton">キャンセル</button>
+          </div>
+          <div id="genreList" class="genre-list"></div>
+          <div id="genreMessage" class="message"></div>
+        </section>
         <div class="grid">
           <form id="productForm" class="panel form">
             <input id="productId" type="hidden" />
@@ -303,24 +377,7 @@
               </div>
               <div class="field">
                 <label for="genre">ジャンル</label>
-                <select id="genre" required>
-                  <option value="データ基盤">データ基盤</option>
-                  <option value="セキュリティ">セキュリティ</option>
-                  <option value="ゼロトラスト">ゼロトラスト</option>
-                  <option value="AI/ML">AI/ML</option>
-                  <option value="MLOps">MLOps</option>
-                  <option value="医療DX">医療DX</option>
-                  <option value="製造DX">製造DX</option>
-                  <option value="金融DX">金融DX</option>
-                  <option value="MSP">MSP</option>
-                  <option value="WAF">WAF</option>
-                  <option value="CDN">CDN</option>
-                  <option value="監視・運用">監視・運用</option>
-                  <option value="パートナー製品">パートナー製品</option>
-                  <option value="Gold Partner">Gold Partner</option>
-                  <option value="Advanced Tier">Advanced Tier</option>
-                  <option value="Technology Partner">Technology Partner</option>
-                </select>
+                <select id="genre" required></select>
               </div>
             </div>
             <div class="field">
@@ -374,6 +431,9 @@
     const API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
     const tokenKey = "suho_news_admin_token";
     let products = [];
+    let genres = [];
+    let editingGenreId = "";
+    let editingGenreOriginalName = "";
 
     const loginPanel = document.getElementById("loginPanel");
     const adminPanel = document.getElementById("adminPanel");
@@ -385,6 +445,12 @@
     const imageFile = document.getElementById("imageFile");
     const logoData = document.getElementById("logoData");
     const imagePreview = document.getElementById("imagePreview");
+    const genreSelect = document.getElementById("genre");
+    const genreName = document.getElementById("genreName");
+    const genreList = document.getElementById("genreList");
+    const genreMessage = document.getElementById("genreMessage");
+    const saveGenreButton = document.getElementById("saveGenreButton");
+    const cancelGenreButton = document.getElementById("cancelGenreButton");
 
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -420,8 +486,10 @@
       }
     });
 
+    saveGenreButton.addEventListener("click", saveGenre);
+    cancelGenreButton.addEventListener("click", clearGenreForm);
     document.getElementById("newButton").addEventListener("click", clearForm);
-    document.getElementById("refreshButton").addEventListener("click", loadProducts);
+    document.getElementById("refreshButton").addEventListener("click", loadAll);
     document.getElementById("removeImageButton").addEventListener("click", () => {
       imageFile.value = "";
       logoData.value = "";
@@ -450,13 +518,128 @@
     async function showAdmin() {
       loginPanel.classList.add("hidden");
       adminPanel.classList.remove("hidden");
-      await loadProducts();
+      await loadAll();
+    }
+
+    async function loadAll() {
+      await Promise.all([loadGenres(), loadProducts()]);
+    }
+
+    async function loadGenres() {
+      const result = await api("/product-genres", {}, false);
+      genres = result.genres || [];
+      renderGenreOptions();
+      renderGenreList();
     }
 
     async function loadProducts() {
       const result = await api("/products", {}, false);
       products = result.products || [];
+      products.forEach((product) => ensureGenreOption(product.genre));
       renderList();
+    }
+
+    function renderGenreOptions(selectedValue = genreSelect.value) {
+      const uniqueGenres = uniqueGenreNames([...genres.map((genre) => genre.name), ...products.map((product) => product.genre)]);
+      genreSelect.innerHTML = uniqueGenres
+        .map((name) => `<option value="${escapeAttribute(name)}">${escapeHtml(name)}</option>`)
+        .join("");
+      if (selectedValue) ensureGenreOption(selectedValue);
+      if (selectedValue && [...genreSelect.options].some((option) => option.value === selectedValue)) {
+        genreSelect.value = selectedValue;
+      }
+    }
+
+    function renderGenreList() {
+      genreList.innerHTML = genres.length ? genres.map((genre) => `
+        <span class="genre-chip">
+          <span>${escapeHtml(genre.name)}</span>
+          <button class="chip-button" type="button" data-edit-genre="${escapeAttribute(genre.id)}">編集</button>
+          <button class="chip-button danger" type="button" data-delete-genre="${escapeAttribute(genre.id)}">削除</button>
+        </span>
+      `).join("") : `<span class="pill">ジャンルがありません</span>`;
+
+      genreList.querySelectorAll("[data-edit-genre]").forEach((button) => {
+        button.addEventListener("click", () => editGenre(button.dataset.editGenre));
+      });
+      genreList.querySelectorAll("[data-delete-genre]").forEach((button) => {
+        button.addEventListener("click", () => deleteGenre(button.dataset.deleteGenre));
+      });
+    }
+
+    async function saveGenre() {
+      const name = genreName.value.trim();
+      if (!name) {
+        setMessage(genreMessage, "ジャンル名を入力してください。", "error");
+        return;
+      }
+
+      try {
+        setMessage(genreMessage, "保存中...");
+        const result = await api(editingGenreId ? `/product-genres/${encodeURIComponent(editingGenreId)}` : "/product-genres", {
+          method: editingGenreId ? "PUT" : "POST",
+          body: JSON.stringify({ name })
+        });
+        genres = result.genres || [];
+        if (editingGenreId && editingGenreOriginalName && editingGenreOriginalName !== name) {
+          await syncProductGenreName(editingGenreOriginalName, name);
+        }
+        clearGenreForm();
+        renderGenreOptions(name);
+        renderGenreList();
+        renderList();
+        setMessage(genreMessage, "保存しました。", "ok");
+      } catch (error) {
+        setMessage(genreMessage, error.message || "保存に失敗しました。", "error");
+      }
+    }
+
+    function editGenre(id) {
+      const genre = genres.find((item) => item.id === id);
+      if (!genre) return;
+      editingGenreId = genre.id;
+      editingGenreOriginalName = genre.name;
+      genreName.value = genre.name;
+      saveGenreButton.textContent = "更新する";
+      setMessage(genreMessage, "ジャンルを編集中です。", "ok");
+      genreName.focus();
+    }
+
+    async function deleteGenre(id) {
+      const genre = genres.find((item) => item.id === id);
+      if (!genre) return;
+      const usedCount = products.filter((product) => product.genre === genre.name).length;
+      const suffix = usedCount ? `\n\n${usedCount}件の商品カードで使用されています。既存カードの表示名はそのまま残ります。` : "";
+      if (!confirm(`「${genre.name}」を削除しますか？${suffix}`)) return;
+
+      try {
+        const result = await api(`/product-genres/${encodeURIComponent(id)}`, { method: "DELETE" });
+        genres = result.genres || [];
+        clearGenreForm();
+        renderGenreOptions();
+        renderGenreList();
+        setMessage(genreMessage, "削除しました。", "ok");
+      } catch (error) {
+        setMessage(genreMessage, error.message || "削除に失敗しました。", "error");
+      }
+    }
+
+    async function syncProductGenreName(fromName, toName) {
+      const next = products.map((product) => product.genre === fromName ? { ...product, genre: toName } : product);
+      if (JSON.stringify(next) === JSON.stringify(products)) return;
+      const result = await api("/products", {
+        method: "PUT",
+        body: JSON.stringify({ products: next })
+      });
+      products = result.products || next;
+    }
+
+    function clearGenreForm() {
+      editingGenreId = "";
+      editingGenreOriginalName = "";
+      genreName.value = "";
+      saveGenreButton.textContent = "追加する";
+      setMessage(genreMessage, "");
     }
 
     function renderList() {
@@ -527,6 +710,7 @@
     function clearForm() {
       productForm.reset();
       document.getElementById("productId").value = "";
+      renderGenreOptions();
       imageFile.value = "";
       logoData.value = "";
       setImagePreview("");
@@ -534,9 +718,17 @@
     }
 
     function ensureGenreOption(value) {
-      const genre = document.getElementById("genre");
-      if (!value || [...genre.options].some((option) => option.value === value)) return;
-      genre.add(new Option(value, value));
+      if (!value || [...genreSelect.options].some((option) => option.value === value)) return;
+      genreSelect.add(new Option(value, value));
+    }
+
+    function uniqueGenreNames(values) {
+      const seen = new Set();
+      return values.map((value) => String(value || "").trim()).filter((value) => {
+        if (!value || seen.has(value)) return false;
+        seen.add(value);
+        return true;
+      });
     }
 
     function setImagePreview(src) {
