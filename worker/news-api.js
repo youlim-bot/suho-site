@@ -2,6 +2,7 @@ const ARTICLES_KEY = "articles";
 const HISTORY_KEY = "history";
 const PRODUCTS_KEY = "products";
 const LOGOS_KEY = "logos";
+const SITE_TEXTS_KEY = "siteTexts";
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
 
 const DEFAULT_ARTICLES = [
@@ -204,6 +205,38 @@ const DEFAULT_LOGOS = [
   y: 0
 }));
 
+const DEFAULT_SITE_TEXTS = [
+  ["hero.eyebrow", "メイン / ラベル", "AI & Cloud Innovation"],
+  ["hero.title", "メイン / 見出し", "ビジネスを 次のステージへ\n進化させる"],
+  ["hero.lead", "メイン / 説明", "AIとクラウドの力で、あなたのビジネスに革命をもたらします。最先端のテクノロジーと深い専門知識で、未来を共に創ります。"],
+  ["hero.primaryCta", "メイン / ボタン1", "サービスを見る"],
+  ["hero.secondaryCta", "メイン / ボタン2", "お問い合わせ"],
+  ["services.kicker", "01 AI / ラベル", "01 - AI Innovation"],
+  ["services.title", "01 AI / 見出し", "AI活用で実現する\n業務変革と効率化"],
+  ["services.lead", "01 AI / 説明", "Local LLMの導入支援から、業務課題に合わせたAIソリューションの選定・設計・運用まで、現場で使える形で導入をサポートします。"],
+  ["cloud.kicker", "02 Cloud / ラベル", "02 - Cloud Consulting"],
+  ["cloud.title", "02 Cloud / 見出し", "クラウドで実現する\nスケーラブルな未来"],
+  ["cloud.lead", "02 Cloud / 説明", "AWS・NAVER CLOUD PLATFORM・NHN Cloudのマルチクラウド戦略から移行支援、コスト最適化まで、クラウドジャーニーの全てをサポートします。"],
+  ["managed.kicker", "03 Managed / ラベル", "03 - Managed Service"],
+  ["managed.title", "03 Managed / 見出し", "24/7 監視・運用で\n安心のインフラ管理"],
+  ["managed.lead", "03 Managed / 説明", "インフラ運用をスホに委託し、\nコア事業に集中できる環境を実現します。プロアクティブな監視で障害を未然に防ぎます。"],
+  ["managed.step1.title", "03 Managed / 01 見出し", "24/7 監視体制"],
+  ["managed.step1.desc", "03 Managed / 01 説明", "専任チームが24時間365日システムを監視し、インシデントへ迅速に対応します。"],
+  ["managed.step2.title", "03 Managed / 02 見出し", "自動化運用"],
+  ["managed.step2.desc", "03 Managed / 02 説明", "AIOpsを活用した自動スケーリング・自動修復により、安定稼働を支えます。"],
+  ["managed.step3.title", "03 Managed / 03 見出し", "コスト最適化"],
+  ["managed.step3.desc", "03 Managed / 03 説明", "リソース利用状況を継続的に分析し、クラウドコストを適正化します。"],
+  ["products.kicker", "04 Products / ラベル", "04 - Security & Products"],
+  ["products.title", "04 Products / 見出し", "セキュリティ＆プロダクト"],
+  ["products.lead", "04 Products / 説明", "ゼロトラストセキュリティから業界特化ソリューション、パートナー製品まで、課題に合わせた導入を支援します。"],
+  ["about.kicker", "05 About / ラベル", "05 - About"],
+  ["about.title", "05 About / 見出し", "会社概要"],
+  ["about.lead", "05 About / 説明", "株式会社スホは、クラウドプラットフォーム、データセンター、プロダクト販売、ソリューション、運用支援、ゲーム事業まで幅広いITサービスを提供しています。"],
+  ["contact.title", "お問い合わせ / 見出し", "さあ、始めましょう"],
+  ["contact.lead", "お問い合わせ / 説明", "ビジネスのデジタル変革について、まずはお気軽にご相談ください。\ncontact@suhojapan.com"],
+  ["footer.tagline", "フッター / タグライン", "AIとクラウドの力で日本のビジネスを変革する"]
+].map(([key, label, value]) => ({ key, label, value }));
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
@@ -233,6 +266,10 @@ export default {
 
       if (request.method === "GET" && path === "/logos") {
         return json({ logos: await getLogos(env) });
+      }
+
+      if (request.method === "GET" && path === "/site-texts") {
+        return json({ texts: await getSiteTexts(env) });
       }
 
       if (request.method === "POST" && path === "/login") {
@@ -360,6 +397,14 @@ export default {
         return json({ logos });
       }
 
+      if (path === "/site-texts" && request.method === "PUT") {
+        await requireAdmin(request, env);
+        const body = await request.json();
+        const texts = validateSiteTexts(body.texts);
+        await env.NEWS_KV.put(SITE_TEXTS_KEY, JSON.stringify(texts));
+        return json({ texts });
+      }
+
       if (path === "/logos" && request.method === "POST") {
         await requireAdmin(request, env);
         const logo = validateLogo(await request.json());
@@ -415,6 +460,15 @@ async function getProducts(env) {
 async function getLogos(env) {
   const stored = await env.NEWS_KV.get(LOGOS_KEY, "json");
   return Array.isArray(stored) ? stored : DEFAULT_LOGOS;
+}
+
+async function getSiteTexts(env) {
+  const stored = await env.NEWS_KV.get(SITE_TEXTS_KEY, "json");
+  const storedMap = new Map(Array.isArray(stored) ? stored.map((item) => [item.key, item.value]) : []);
+  return DEFAULT_SITE_TEXTS.map((item) => ({
+    ...item,
+    value: storedMap.has(item.key) ? String(storedMap.get(item.key)) : item.value
+  }));
 }
 
 function validateArticles(value) {
@@ -531,6 +585,23 @@ function validateProduct(value) {
 function validateLogos(value) {
   if (!Array.isArray(value)) throw httpError("logos must be an array", 400);
   return value.map(validateLogo);
+}
+
+function validateSiteTexts(value) {
+  if (!Array.isArray(value)) throw httpError("texts must be an array", 400);
+  const allowed = new Map(DEFAULT_SITE_TEXTS.map((item) => [item.key, item]));
+  return value.map((item) => {
+    const key = String(item.key || "").trim();
+    const template = allowed.get(key);
+    if (!template) throw httpError("invalid text key", 400);
+    const text = {
+      key,
+      label: template.label,
+      value: String(item.value || "").trim()
+    };
+    if (text.value.length > 1200) throw httpError("text is too long", 400);
+    return text;
+  });
 }
 
 function validateLogo(value) {

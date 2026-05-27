@@ -245,7 +245,7 @@
     <div class="container">
       <section id="loginPanel" class="panel login">
         <h1>管理ダッシュボード</h1>
-        <p class="lead">ニュース、沿革、Security & Products、ロゴ電光板を一か所で管理できます。</p>
+        <p class="lead">サイト文言、ニュース、沿革、Security & Products、ロゴ電光板を一か所で管理できます。</p>
         <form id="loginForm">
           <div class="field">
             <label for="password">管理者パスワード</label>
@@ -267,6 +267,7 @@
 
         <div class="tabs" role="tablist" aria-label="Admin sections">
           <button class="tab active" type="button" data-admin-tab="news">ニュース</button>
+          <button class="tab" type="button" data-admin-tab="texts">サイト文言</button>
           <button class="tab" type="button" data-admin-tab="history">沿革</button>
           <button class="tab" type="button" data-admin-tab="products">Security & Products</button>
           <button class="tab" type="button" data-admin-tab="logos">ロゴ電光板</button>
@@ -284,6 +285,7 @@
     const tokenKey = "suho_news_admin_token";
     const pages = {
       news: "news/",
+      texts: "texts/",
       history: "history/",
       products: "products/",
       logos: "logos/"
