@@ -739,9 +739,14 @@
       display: block;
       margin-top: 8px;
       color: var(--cyan);
-      font-size: 30px;
+      font-size: 0;
       font-weight: 700;
       line-height: 1;
+    }
+
+    .metric-box b::before {
+      content: attr(data-value) "%";
+      font-size: 30px;
     }
 
     .metric-bar {
@@ -758,6 +763,7 @@
       border-radius: inherit;
       background: var(--cyan);
       opacity: 0.72;
+      transition: width 900ms ease;
     }
 
     .chart {
@@ -795,6 +801,7 @@
       border-radius: 4px 4px 0 0;
       background: rgba(0, 210, 255, 0.12);
       border-top: 1px solid rgba(0, 210, 255, 0.24);
+      transition: height 900ms ease, background 900ms ease, border-color 900ms ease;
     }
 
     .bar.active {
@@ -1558,10 +1565,10 @@
               <span class="status">All Systems Operational</span>
             </div>
             <div class="metric-grid">
-              <div class="metric-box"><span>CPU Usage</span><b>23%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:23%"></span></div></div>
-              <div class="metric-box"><span>Memory</span><b>61%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:61%"></span></div></div>
-              <div class="metric-box"><span>Network I/O</span><b>45%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:45%"></span></div></div>
-              <div class="metric-box"><span>Storage</span><b>38%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:38%"></span></div></div>
+              <div class="metric-box" data-metric="cpu" data-base="23" data-min="18" data-max="36"><span>CPU Usage</span><b data-value="23">23%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:23%"></span></div></div>
+              <div class="metric-box" data-metric="memory" data-base="61" data-min="54" data-max="72"><span>Memory</span><b data-value="61">61%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:61%"></span></div></div>
+              <div class="metric-box" data-metric="network" data-base="45" data-min="32" data-max="58"><span>Network I/O</span><b data-value="45">45%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:45%"></span></div></div>
+              <div class="metric-box" data-metric="storage" data-base="38" data-min="34" data-max="47"><span>Storage</span><b data-value="38">38%</b><div class="metric-bar"><span class="metric-bar-fill" style="width:38%"></span></div></div>
             </div>
             <div class="chart" aria-label="Infrastructure utilization chart">
               <div class="chart-head"><span>Throughput - Last 7 days</span><span>100%</span></div>
@@ -2091,6 +2098,51 @@
       return escapeHtml(String(product.title || "S").trim().charAt(0).toUpperCase());
     }
 
+    function initLiveDashboard() {
+      const dashboard = document.querySelector(".dashboard");
+      if (!dashboard) return;
+
+      const metricCards = [...dashboard.querySelectorAll(".metric-box")];
+      const chartBars = [...dashboard.querySelectorAll(".chart-bars .bar")];
+      if (!metricCards.length || !chartBars.length) return;
+
+      const metricState = metricCards.map((card) => {
+        const min = Number(card.dataset.min) || 10;
+        const max = Number(card.dataset.max) || 90;
+        const base = Number(card.dataset.base) || Math.round((min + max) / 2);
+        return {
+          card,
+          value: base,
+          min,
+          max,
+          output: card.querySelector("b"),
+          bar: card.querySelector(".metric-bar-fill")
+        };
+      });
+      const chartState = chartBars.map((bar) => Number.parseFloat(bar.style.height) || 50);
+
+      function updateMetrics() {
+        metricState.forEach((metric) => {
+          const drift = (Math.random() - 0.44) * 8;
+          const next = clamp(Math.round(metric.value + drift), metric.min, metric.max);
+          metric.value = next;
+          metric.output.setAttribute("data-value", next);
+          metric.bar.style.width = `${next}%`;
+        });
+
+        chartBars.forEach((bar, index) => {
+          const drift = (Math.random() - 0.42) * 18;
+          const next = clamp(Math.round(chartState[index] + drift), 30, 90);
+          chartState[index] = next;
+          bar.style.height = `${next}%`;
+          bar.classList.toggle("active", next > 76);
+        });
+      }
+
+      updateMetrics();
+      window.setInterval(updateMetrics, 2600);
+    }
+
     contactForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const button = contactForm.querySelector("button[type='submit']");
@@ -2208,6 +2260,7 @@
     }, { threshold: 0.14 });
 
     document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+    initLiveDashboard();
 
     function escapeHtml(value) {
       return String(value || "").replace(/[&<>"']/g, (char) => ({
