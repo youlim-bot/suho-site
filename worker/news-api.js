@@ -4,6 +4,8 @@ const PRODUCTS_KEY = "products";
 const PRODUCT_GENRES_KEY = "productGenres";
 const LOGOS_KEY = "logos";
 const SITE_TEXTS_KEY = "siteTexts";
+const ANALYTICS_PREFIX = "analytics:";
+const MAX_ANALYTICS_SESSIONS = 8000;
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
 
 const DEFAULT_ARTICLES = [
@@ -298,6 +300,12 @@ export default {
         return json({ texts: await getSiteTexts(env) });
       }
 
+      if (request.method === "POST" && path === "/analytics/event") {
+        const body = await request.json().catch(() => ({}));
+        await recordAnalyticsEvent(env, body);
+        return json({ ok: true });
+      }
+
       if (request.method === "POST" && path === "/login") {
         const body = await request.json().catch(() => ({}));
         const hash = await sha256(String(body.password || ""));
@@ -305,6 +313,12 @@ export default {
           return json({ error: "Invalid password" }, 401);
         }
         return json({ token: await signToken(env) });
+      }
+
+      if (request.method === "GET" && path === "/analytics/summary") {
+        await requireAdmin(request, env);
+        const days = clampNumber(url.searchParams.get("days"), 1, 90, 30);
+        return json(await getAnalyticsSummary(env, days));
       }
 
       if (path === "/articles" && request.method === "PUT") {
@@ -542,6 +556,78 @@ async function getSiteTexts(env) {
   }));
 }
 
+async function recordAnalyticsEvent(env, value) {
+  const event = validateAnalyticsEvent(value);
+  if (!event.path) return;
+  const key = `${ANALYTICS_PREFIX}${event.date}`;
+  const current = await env.NEWS_KV.get(key, "json");
+  const bucket = normalizeAnalyticsBucket(current, event.date);
+
+  bucket.pageviews += 1;
+  bucket.lastUpdated = new Date().toISOString();
+  increment(bucket.pages, event.path);
+  increment(bucket.referrers, event.referrer || "Direct");
+  increment(bucket.devices, event.device);
+
+  if (event.sessionId) {
+    bucket.sessions[event.sessionId] = 1;
+    if (Object.keys(bucket.sessions).length > MAX_ANALYTICS_SESSIONS) {
+      bucket.sessions = Object.fromEntries(Object.keys(bucket.sessions).slice(-MAX_ANALYTICS_SESSIONS).map((id) => [id, 1]));
+    }
+  }
+
+  if (event.previousPath && event.previousPath !== event.path) {
+    increment(bucket.flows, `${event.previousPath} → ${event.path}`);
+  }
+
+  await env.NEWS_KV.put(key, JSON.stringify(bucket), {
+    expirationTtl: 60 * 60 * 24 * 120
+  });
+}
+
+async function getAnalyticsSummary(env, days) {
+  const dates = recentDates(days);
+  const buckets = await Promise.all(dates.map(async (date) => normalizeAnalyticsBucket(await env.NEWS_KV.get(`${ANALYTICS_PREFIX}${date}`, "json"), date)));
+  const totals = {
+    pageviews: 0,
+    visitors: 0,
+    pages: {},
+    referrers: {},
+    flows: {},
+    devices: {}
+  };
+
+  const daily = buckets.map((bucket) => {
+    const visitors = Object.keys(bucket.sessions || {}).length;
+    totals.pageviews += bucket.pageviews || 0;
+    totals.visitors += visitors;
+    mergeCounts(totals.pages, bucket.pages);
+    mergeCounts(totals.referrers, bucket.referrers);
+    mergeCounts(totals.flows, bucket.flows);
+    mergeCounts(totals.devices, bucket.devices);
+    return {
+      date: bucket.date,
+      pageviews: bucket.pageviews || 0,
+      visitors
+    };
+  });
+
+  return {
+    days,
+    generatedAt: new Date().toISOString(),
+    totals: {
+      pageviews: totals.pageviews,
+      visitors: totals.visitors,
+      avgViewsPerVisitor: totals.visitors ? Number((totals.pageviews / totals.visitors).toFixed(2)) : 0
+    },
+    daily,
+    pages: topCounts(totals.pages, 12),
+    referrers: topCounts(totals.referrers, 8),
+    flows: topCounts(totals.flows, 10),
+    devices: topCounts(totals.devices, 6)
+  };
+}
+
 function validateArticles(value) {
   if (!Array.isArray(value)) throw httpError("articles must be an array", 400);
   return value.map(validateArticle);
@@ -673,6 +759,86 @@ function validateProduct(value) {
   return product;
 }
 
+function validateAnalyticsEvent(value) {
+  const path = normalizeAnalyticsPath(value.path || "/");
+  const previousPath = normalizeAnalyticsPath(value.previousPath || "");
+  return {
+    date: new Date().toISOString().slice(0, 10),
+    path,
+    previousPath: previousPath === path ? "" : previousPath,
+    referrer: normalizeReferrer(value.referrer || ""),
+    sessionId: String(value.sessionId || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80),
+    device: normalizeDevice(value.device || value.userAgent || "")
+  };
+}
+
+function normalizeAnalyticsPath(value) {
+  const path = String(value || "").trim().slice(0, 140);
+  if (!path || path.startsWith("/admin")) return "";
+  if (path === "/index.html") return "/";
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
+function normalizeReferrer(value) {
+  const referrer = String(value || "").trim();
+  if (!referrer) return "Direct";
+  try {
+    const url = new URL(referrer);
+    if (/suho-site\.pages\.dev$/i.test(url.hostname)) return "Internal";
+    return url.hostname.replace(/^www\./i, "").slice(0, 80);
+  } catch {
+    return referrer.slice(0, 80);
+  }
+}
+
+function normalizeDevice(value) {
+  const source = String(value || "").toLowerCase();
+  if (/mobile|iphone|android/.test(source)) return "Mobile";
+  if (/ipad|tablet/.test(source)) return "Tablet";
+  return "Desktop";
+}
+
+function normalizeAnalyticsBucket(value, date) {
+  const bucket = value && typeof value === "object" ? value : {};
+  return {
+    date,
+    pageviews: Number(bucket.pageviews) || 0,
+    pages: isPlainObject(bucket.pages) ? bucket.pages : {},
+    referrers: isPlainObject(bucket.referrers) ? bucket.referrers : {},
+    flows: isPlainObject(bucket.flows) ? bucket.flows : {},
+    devices: isPlainObject(bucket.devices) ? bucket.devices : {},
+    sessions: isPlainObject(bucket.sessions) ? bucket.sessions : {},
+    lastUpdated: String(bucket.lastUpdated || "")
+  };
+}
+
+function recentDates(days) {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() - (days - index - 1));
+    return date.toISOString().slice(0, 10);
+  });
+}
+
+function increment(target, key) {
+  if (!key) return;
+  target[key] = (Number(target[key]) || 0) + 1;
+}
+
+function mergeCounts(target, source) {
+  Object.entries(source || {}).forEach(([key, count]) => {
+    target[key] = (Number(target[key]) || 0) + (Number(count) || 0);
+  });
+}
+
+function topCounts(source, limit) {
+  return Object.entries(source || {})
+    .map(([label, value]) => ({ label, value: Number(value) || 0 }))
+    .filter((item) => item.label && item.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, limit);
+}
+
 function validateLogos(value) {
   if (!Array.isArray(value)) throw httpError("logos must be an array", 400);
   return value.map(validateLogo);
@@ -723,6 +889,10 @@ function clampNumber(value, min, max, fallback) {
   const number = Number(value);
   if (!Number.isFinite(number)) return fallback;
   return Math.min(max, Math.max(min, number));
+}
+
+function isPlainObject(value) {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
 
 function sortHistory(history) {
