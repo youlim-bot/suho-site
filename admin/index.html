@@ -266,10 +266,10 @@
         </div>
 
         <div class="tabs" role="tablist" aria-label="Admin sections">
-          <button class="tab active" type="button" data-admin-tab="news">ニュース</button>
-          <button class="tab" type="button" data-admin-tab="texts">サイト文言</button>
+          <button class="tab active" type="button" data-admin-tab="products">Security & Products</button>
+          <button class="tab" type="button" data-admin-tab="news">ニュース</button>
           <button class="tab" type="button" data-admin-tab="history">沿革</button>
-          <button class="tab" type="button" data-admin-tab="products">Security & Products</button>
+          <button class="tab" type="button" data-admin-tab="texts">サイト文言</button>
           <button class="tab" type="button" data-admin-tab="logos">ロゴ電光板</button>
         </div>
 
@@ -284,10 +284,10 @@
     const API_URL = localStorage.getItem("suho_news_api_url") || "https://suho-site-news-api.biz-e3c.workers.dev";
     const tokenKey = "suho_news_admin_token";
     const pages = {
-      news: "news/",
-      texts: "texts/",
-      history: "history/",
       products: "products/",
+      news: "news/",
+      history: "history/",
+      texts: "texts/",
       logos: "logos/"
     };
 
@@ -326,8 +326,8 @@
       location.hash = "";
     });
 
-    function showDashboard(tabName = "news") {
-      const safeTab = pages[tabName] ? tabName : "news";
+    function showDashboard(tabName = "products") {
+      const safeTab = pages[tabName] ? tabName : "products";
       loginPanel.classList.add("hidden");
       dashboardPanel.classList.remove("hidden");
       tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.adminTab === safeTab));
@@ -337,7 +337,7 @@
 
     function currentTab() {
       const hash = location.hash.replace("#", "");
-      return pages[hash] ? hash : "news";
+      return pages[hash] ? hash : "products";
     }
 
     async function api(path, options = {}) {
